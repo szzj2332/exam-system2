@@ -286,13 +286,36 @@ function updateTimerDisplay() {
     `⏱ 剩余时间：${m}分${s.toString().padStart(2,'0')}秒`;
 }
 
-function submitExam() {
+async function submitExam() {
   if(examSubmitted) return;
   if(!confirm('确认提交答卷？提交后不能修改！')) return;
   examSubmitted = true;
   clearInterval(timerInterval);
   document.getElementById('submitBtn').disabled = true;
   
+  // 数据上报
+  const reportData = {
+    name: studentInfo.name,
+    park: studentInfo.park,
+    role: studentInfo.role,
+    answers: EXAM_DATA.questions.map((q, idx) => {
+      const sel = document.querySelector(`input[name="q${idx}"]:checked`);
+      return sel ? parseInt(sel.value) : -1;
+    }),
+    correctCount: 0,
+    wrongCount: 0
+  };
+  const reportData = {
+    name: studentInfo.name,
+    park: studentInfo.park,
+    role: studentInfo.role,
+    answers: EXAM_DATA.questions.map((q, idx) => {
+      const sel = document.querySelector(`input[name="q${idx}"]:checked`);
+      return sel ? parseInt(sel.value) : -1;
+    }),
+    correctCount: 0,
+    wrongCount: 0
+  };
   let score = 0;
   let correct = 0;
   let wrong = 0;
@@ -344,6 +367,26 @@ function submitExam() {
   const passText = score >= EXAM_DATA.passScore ? '🎉 恭喜通过！' : '😢 未通过（需≥90分）';
   document.getElementById('resultTitle').textContent = passText;
   
+  reportData.correctCount = correct;
+  reportData.wrongCount = wrong;
+  // 上报答题数据到后端
+  try {
+    await fetch('http://10.9.236.141:5000/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: reportData.name,
+        park: reportData.park,
+        role: reportData.role,
+        score: score,
+        total: EXAM_DATA.totalScore,
+        pass: score >= EXAM_DATA.passScore,
+        correct: reportData.correctCount,
+        wrong: reportData.wrongCount,
+        title: EXAM_DATA.title
+      })
+    });
+  } catch(e) { console.log('数据上报异常:', e); }
   incrementAttempts();
 }
 </script>
