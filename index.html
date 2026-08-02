@@ -15,7 +15,6 @@ h1{text-align:center;font-size:24px;margin-bottom:5px}
 .form-field input{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:16px}
 .btn{display:block;width:100%;padding:14px;background:#1a73e8;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;margin-top:10px}
 .btn:disabled{background:#aaa}
-.btn.s{background:#666}
 .timer{background:#fff8e1;padding:12px;border-radius:8px;margin:15px 0;text-align:center;font-size:16px;font-weight:700;display:none}
 .timer.warning{color:#e74c3c}
 .q-card{background:#fafbfc;border:1px solid #e8eaed;border-radius:12px;padding:16px;margin-bottom:15px}
@@ -39,12 +38,11 @@ h1{text-align:center;font-size:24px;margin-bottom:5px}
 <div class="container">
 <h1>消防实操12条考试</h1>
 <div class="sub">满分100分 · 98分及格 · 90题 · 35分钟</div>
-
-<div class="score-info">
-<b>40</b> 道单选题 每题 <b>1</b> 分 = <b>40</b> 分 &nbsp;·&nbsp;
-<b>10</b> 道多选题 每题 <b>2</b> 分 = <b>20</b> 分 &nbsp;·&nbsp;
-<b>40</b> 道判断题 每题 <b>1</b> 分 = <b>40</b> 分<br>
-<span style="color:#e74c3c">⏱ 考试时间 35 分钟 · 超时自动交卷</span>
+<div>
+<b>40</b> 道单选×<b>1</b>分 = <b>40</b>分 &nbsp;·&nbsp;
+<b>10</b> 道多选×<b>2</b>分 = <b>20</b>分 &nbsp;·&nbsp;
+<b>40</b> 道判断×<b>1</b>分 = <b>40</b>分<br>
+<span style="color:#e74c3c">⏱ 35分钟 · 超时自动交卷</span>
 </div>
 
 <div class="form-field">
@@ -60,14 +58,11 @@ h1{text-align:center;font-size:24px;margin-bottom:5px}
 <input id="role">
 </div>
 <button class="btn" id="startBtn" onclick="start()">📝 开始考试</button>
-
 <div class="timer" id="timer"></div>
-
 <div id="q_area" style="display:none">
 <div id="q_list"></div>
 <button class="btn" id="submitBtn" onclick="submit()">📤 提交答卷</button>
 </div>
-
 <div id="resultPanel">
 <h2 id="r_title"></h2>
 <div id="scoreDisplay"></div>
@@ -93,8 +88,7 @@ function start(){
   list.innerHTML='';
   Q.questions.forEach(function(q,i){
     var lt={single:'单选',multiple:'多选',judge:'判断'};
-    var tc={single:'s',multiple:'m',judge:'j'};
-    var card='<div class="q-card"><div class="q-header"><span class="q-typetag">'+lt[q.type]+'</span><span class="q-scoret">'+q.score+' 分</span></div><div class="q-stem">'+(i+1)+'. '+q.stem+'</div><div class="options">';
+    var card='<div class="q-card"><div class="q-header"><span style="font-size:13px;padding:2px 8px;border-radius:4px;color:#fff;background:#1a73e8">'+lt[q.type]+'</span><span style="font-size:13px;color:#888">'+q.score+' 分</span></div><div class="q-stem">'+(i+1)+'. '+q.stem+'</div><div class="options">';
     q.options.forEach(function(o,j){
       card += '<label><input type="'+(q.type=='judge'?'radio':'checkbox')+'" name="q'+i+'" value="'+j+'"> '+ o +'</label>';
     });
@@ -136,6 +130,12 @@ function submit(){
     else{wrong++;fb.className='fb wrong';fb.textContent='✗ 错误';}
   });
   document.getElementById('submitBtn').disabled=true;
+
+  // 上报考试结果
+  var rec = {name:document.getElementById('name').value,park:document.getElementById('park').value,role:document.getElementById('role').value,score:score,total:Q.totalScore,result:score>=98?'通过':'未通过',correct:correct,wrong:wrong,time:new Date().toLocaleString()};
+  fetch('https://webhook.site/e7d85735-fcb6-49b7-ae64-84c0a84d8875',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(rec)});
+  try{localStorage.setItem('exam_last',JSON.stringify(rec))}catch(e){}
+
   var rp=document.getElementById('resultPanel');
   rp.style.display='block';
   document.getElementById('r_title').textContent=score>=Q.passScore?'🎉 恭喜通过！':'😢 未通过（需'+Q.passScore+'分）';
