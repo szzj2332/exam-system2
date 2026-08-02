@@ -66,21 +66,7 @@ h1{text-align:center;font-size:24px;color:#1a1a2e;margin-bottom:8px;font-weight:
 .result-panel .stat{display:flex;gap:20px;justify-content:center;margin:15px 0}
 
 @keyframes pulse{50%{opacity:.4}}
-
-/* 移动端优化 */
-@media (max-width: 640px) {
-  .container{padding:15px 12px;margin:10px auto}
-  h1{font-size:20px}
-  .form-field{min-width:100%;flex:100%}
-  .form-field input,.form-field select{font-size:16px;padding:12px}
-  .btn-start{font-size:16px;padding:14px}
-  .status-bar{padding:12px;font-size:13px}
-  .q-card{padding:14px;font-size:14px}
-  .q-card .q-stem{font-size:14px}
-  .q-card .options label{padding:10px 12px;font-size:14px}
-  .btn-submit{width:100%;padding:16px;font-size:16px}
-  .timer-bar .timer-text{font-size:16px}
-}</style>
+</style>
 </head>
 <body>
 
@@ -105,7 +91,6 @@ h1{text-align:center;font-size:24px;color:#1a1a2e;margin-bottom:8px;font-weight:
         <input type="text" id="studentRole" placeholder="如：安管员/保安主管" required>
       </div>
     </div>
-    <div id="debugInfo" style="padding:8px 12px;margin:8px 0;border-radius:6px;background:#fff3cd;color:#856404;font-size:13px;display:none"></div>
     <button class="btn-start" id="startBtn" onclick="startExam()">📝 开始考试</button>
   </div>
 
@@ -143,24 +128,6 @@ h1{text-align:center;font-size:24px;color:#1a1a2e;margin-bottom:8px;font-weight:
 </div>
 
 <script>
-// 页面加载调试
-window.onerror = function(msg, url, line, col, err) {
-  document.getElementById('debugInfo').innerHTML = 
-    '❌ 错误: ' + msg + '<br>行: ' + line + '<br>' + (err ? err.stack : '');
-};
-// 记录页面加载
-document.addEventListener('DOMContentLoaded', function() {
-  var fb = document.getElementById('formFeedback');
-  if(!fb) {
-    // 动态创建一个反馈区
-    var info = document.createElement('div');
-    info.id = 'debugInfo';
-    info.style.cssText = 'padding:10px;margin:10px 0;border-radius:8px;background:#fff3cd;color:#856404;font-size:13px;display:none';
-    document.querySelector('.info-form').appendChild(info);
-  }
-});
-
-
 const EXAM_DATA = {
   "title": "消防实操12条考试",
   "totalScore": 100,
@@ -1314,8 +1281,6 @@ let timerInterval = null;
 let timeRemaining = EXAM_DATA.timeLimit * 60;
 
 function getFingerprint() {
-  try {
-  // 使用 navigator 信息 + 随机种子生成指纹，兼容所有浏览器（含无痕模式）
   var ua = navigator.userAgent || '';
   var lang = navigator.language || '';
   var cores = navigator.hardwareConcurrency || 0;
@@ -1324,10 +1289,9 @@ function getFingerprint() {
   for (var i = 0; i < seed.length; i++) {
     var char = seed.charCodeAt(i);
     hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // 32位整数
+    hash = hash & hash;
   }
   return Math.abs(hash).toString(36).slice(0,8);
-  } catch(e) { return 'fp_' + Math.random().toString(36).slice(2,10); }
 }
 
 function getAttempts() {
@@ -1339,18 +1303,10 @@ function getAttempts() {
 function incrementAttempts() {
   try {
     localStorage.setItem('exam_attempts_' + getFingerprint(), getAttempts() + 1);
-  } catch(e) { /* 私有模式忽略 */ }
+  } catch(e) {}
 }
 
 function startExam() {
-  var dbg = document.getElementById('debugInfo');
-  dbg.style.display = 'block';
-  dbg.innerHTML = '点击了开始考试...<br>';
-  try {
-    dbg.innerHTML += '初始化...';
-  } catch(e) {
-    dbg.innerHTML += '出错: ' + e.message;
-  }
   const name = document.getElementById('studentName').value.trim();
   const park = document.getElementById('studentPark').value.trim();
   const role = document.getElementById('studentRole').value.trim();
@@ -1360,8 +1316,7 @@ function startExam() {
     return;
   }
   
-  let attempts = 0;
-  try { attempts = getAttempts(); } catch(e) {}
+  const attempts = getAttempts();
   if(attempts >= EXAM_DATA.maxAttempts) {
     alert('⚠ 您已用完 ' + EXAM_DATA.maxAttempts + ' 次考试机会！');
     return;
@@ -1369,11 +1324,6 @@ function startExam() {
   
   studentInfo = { name, park, role };
   examStarted = true;
-  
-  // 滚动到题目区域（手机端）
-  setTimeout(function() {
-    document.getElementById('questionArea').scrollIntoView({behavior:'smooth', block:'start'});
-  }, 200);
   
   document.getElementById('showName').textContent = name;
   document.getElementById('showPark').textContent = park;
@@ -1514,12 +1464,33 @@ function submitExam() {
   document.getElementById('correctCount').textContent = correct;
   document.getElementById('wrongCount').textContent = wrong;
   document.getElementById('wrongDetail').textContent = 
-    `⚠ 错误率：${Math.round(wrong/90*100)}% (${wrong}/30题)`;
+    `⚠ 错误率：${Math.round(wrong/30*100)}% (${wrong}/30题)`;
   
-  const passText = score >= EXAM_DATA.passScore ? '🎉 恭喜通过！' : '😢 未通过（需≥98分）';
+  const passText = score >= EXAM_DATA.passScore ? '🎉 恭喜通过！' : '😢 未通过（需≥90分）';
   document.getElementById('resultTitle').textContent = passText;
   
   reportData.correctCount = correct;
   reportData.wrongCount = wrong;
   // 上报答题数据到后端
->
+  try {
+    await fetch('${BACKEND_URL}', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: reportData.name,
+        park: reportData.park,
+        role: reportData.role,
+        score: score,
+        total: EXAM_DATA.totalScore,
+        pass: score >= EXAM_DATA.passScore,
+        correct: reportData.correctCount,
+        wrong: reportData.wrongCount,
+        title: EXAM_DATA.title
+      })
+    });
+  } catch(e) { console.log('数据上报异常:', e); }
+  incrementAttempts();
+}
+</script>
+</body>
+</html>
