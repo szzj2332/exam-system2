@@ -66,7 +66,21 @@ h1{text-align:center;font-size:24px;color:#1a1a2e;margin-bottom:8px;font-weight:
 .result-panel .stat{display:flex;gap:20px;justify-content:center;margin:15px 0}
 
 @keyframes pulse{50%{opacity:.4}}
-</style>
+
+/* 移动端优化 */
+@media (max-width: 640px) {
+  .container{padding:15px 12px;margin:10px auto}
+  h1{font-size:20px}
+  .form-field{min-width:100%;flex:100%}
+  .form-field input,.form-field select{font-size:16px;padding:12px}
+  .btn-start{font-size:16px;padding:14px}
+  .status-bar{padding:12px;font-size:13px}
+  .q-card{padding:14px;font-size:14px}
+  .q-card .q-stem{font-size:14px}
+  .q-card .options label{padding:10px 12px;font-size:14px}
+  .btn-submit{width:100%;padding:16px;font-size:16px}
+  .timer-bar .timer-text{font-size:16px}
+}</style>
 </head>
 <body>
 
@@ -1281,18 +1295,30 @@ let timerInterval = null;
 let timeRemaining = EXAM_DATA.timeLimit * 60;
 
 function getFingerprint() {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  ctx.fillText(navigator.userAgent + screen.width + screen.height, 10, 10);
-  return btoa(ctx.fillText + canvas.toDataURL()).slice(0,32);
+  // 使用 navigator 信息 + 随机种子生成指纹，兼容所有浏览器（含无痕模式）
+  var ua = navigator.userAgent || '';
+  var lang = navigator.language || '';
+  var cores = navigator.hardwareConcurrency || 0;
+  var seed = ua + lang + cores + screen.width + 'x' + screen.height;
+  var hash = 0;
+  for (var i = 0; i < seed.length; i++) {
+    var char = seed.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // 32位整数
+  }
+  return Math.abs(hash).toString(36).slice(0,8);
 }
 
 function getAttempts() {
-  return parseInt(localStorage.getItem('exam_attempts_' + getFingerprint()) || 0);
+  try {
+    return parseInt(localStorage.getItem('exam_attempts_' + getFingerprint()) || 0);
+  } catch(e) { return 0; }
 }
 
 function incrementAttempts() {
-  localStorage.setItem('exam_attempts_' + getFingerprint(), getAttempts() + 1);
+  try {
+    localStorage.setItem('exam_attempts_' + getFingerprint(), getAttempts() + 1);
+  } catch(e) { /* 私有模式忽略 */ }
 }
 
 function startExam() {
@@ -1305,7 +1331,8 @@ function startExam() {
     return;
   }
   
-  const attempts = getAttempts();
+  let attempts = 0;
+  try { attempts = getAttempts(); } catch(e) {}
   if(attempts >= EXAM_DATA.maxAttempts) {
     alert('⚠ 您已用完 ' + EXAM_DATA.maxAttempts + ' 次考试机会！');
     return;
@@ -1313,6 +1340,11 @@ function startExam() {
   
   studentInfo = { name, park, role };
   examStarted = true;
+  
+  // 滚动到题目区域（手机端）
+  setTimeout(function() {
+    document.getElementById('questionArea').scrollIntoView({behavior:'smooth', block:'start'});
+  }, 200);
   
   document.getElementById('showName').textContent = name;
   document.getElementById('showPark').textContent = park;
