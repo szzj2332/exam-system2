@@ -1314,6 +1314,7 @@ let timerInterval = null;
 let timeRemaining = EXAM_DATA.timeLimit * 60;
 
 function getFingerprint() {
+  try {
   // 使用 navigator 信息 + 随机种子生成指纹，兼容所有浏览器（含无痕模式）
   var ua = navigator.userAgent || '';
   var lang = navigator.language || '';
@@ -1326,6 +1327,7 @@ function getFingerprint() {
     hash = hash & hash; // 32位整数
   }
   return Math.abs(hash).toString(36).slice(0,8);
+  } catch(e) { return 'fp_' + Math.random().toString(36).slice(2,10); }
 }
 
 function getAttempts() {
@@ -1341,6 +1343,14 @@ function incrementAttempts() {
 }
 
 function startExam() {
+  var dbg = document.getElementById('debugInfo');
+  dbg.style.display = 'block';
+  dbg.innerHTML = '点击了开始考试...<br>';
+  try {
+    dbg.innerHTML += '初始化...';
+  } catch(e) {
+    dbg.innerHTML += '出错: ' + e.message;
+  }
   const name = document.getElementById('studentName').value.trim();
   const park = document.getElementById('studentPark').value.trim();
   const role = document.getElementById('studentRole').value.trim();
