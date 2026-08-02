@@ -1461,25 +1461,4 @@ async function submitExam() {
   reportData.correctCount = correct;
   reportData.wrongCount = wrong;
   // 上报答题数据到后端
-  try {
-    await fetch('http://10.9.236.141:5000/api/submit', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: reportData.name,
-        park: reportData.park,
-        role: reportData.role,
-        score: score,
-        total: EXAM_DATA.totalScore,
-        pass: score >= EXAM_DATA.passScore,
-        correct: reportData.correctCount,
-        wrong: reportData.wrongCount,
-        title: EXAM_DATA.title
-      })
-    });
-  } catch(e) { console.log('数据上报异常:', e); }
-  incrementAttempts();
-}
-</script>
-</body>
-</html>
+>
