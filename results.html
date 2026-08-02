@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>考试成绩汇总</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:sans-serif;background:#f0f2f5;padding:20px}
+.container{max-width:800px;margin:0 auto;background:#fff;border-radius:16px;padding:20px}
+h1{text-align:center;font-size:22px;margin-bottom:5px}
+.sub{text-align:center;color:#888;font-size:14px;margin-bottom:20px}
+table{width:100%;border-collapse:collapse;margin:15px 0}
+th,td{padding:10px 8px;text-align:center;border-bottom:1px solid #e8eaed;font-size:14px}
+th{background:#1a73e8;color:#fff;font-weight:600}
+tr:nth-child(even){background:#f8f9fa}
+.pass{color:#27ae60;font-weight:600}
+.fail{color:#e74c3c;font-weight:600}
+.stats{display:flex;justify-content:space-around;margin:15px 0;padding:15px;background:#f0f6ff;border-radius:10px}
+.stats div{text-align:center}
+.stats .num{font-size:24px;font-weight:700;color:#1a73e8}
+.stats .label{font-size:13px;color:#666}
+.webhook{text-align:center;margin:20px 0}
+.webhook a{color:#1a73e8;text-decoration:none}
+.webhook a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>消防实操12条考试成绩</h1>
+<div class="sub">数据实时更新</div>
+<div id="stats" class="stats">
+<div><div class="num" id="totalCount">0</div><div class="label">总考试人次</div></div>
+<div><div class="num" id="passCount" style="color:#27ae60">0</div><div class="label">通过人数</div></div>
+<div><div class="num" id="failCount" style="color:#e74c3c">0</div><div class="label">未通过人数</div></div>
+<div><div class="num" id="avgScore">0</div><div class="label">平均分</div></div>
+</div>
+<table>
+<thead><tr><th>序号</th><th>姓名</th><th>园区</th><th>岗位</th><th>得分</th><th>结果</th><th>时间</th></tr></thead>
+<tbody id="tbody"></tbody>
+</table>
+<p style="text-align:center;color:#999;font-size:12px;margin-top:15px">数据每5分钟自动刷新</p>
+</div>
+<script>
+function loadData(){
+  var ts = Date.now();
+  fetch('https://webhook.site/token/e7d85735-fcb6-49b7-ae64-84c0a84d8875/requests?sorting=newest&_='+ts)
+    .then(r=>r.json())
+    .then(d=>{
+      var posts = (d.data||[]).filter(function(r){return r.method=='POST'});
+      var tbody = document.getElementById('tbody');
+      tbody.innerHTML = '';
+      var total = posts.length, pass = 0, fail = 0, sumScore = 0;
+      posts.forEach(function(r,i){
+        var params = new URLSearchParams(r.content||'');
+        var name = params.get('name')||'-';
+        var park = params.get('park')||'-';
+        var role = params.get('role')||'-';
+        var score = parseInt(params.get('score'))||0;
+        var result = params.get('result')||'未通过';
+        var time = params.get('time')||'-';
+        if(result=='通过') pass++;
+        else fail++;
+        sumScore += score;
+        var tr = '<tr><td>'+(total-i)+'</td><td>'+name+'</td><td>'+park+'</td><td>'+role+'</td><td>'+score+'/100</td><td class="'+(result=='通过'?'pass':'fail')+'">'+(result=='通过'?'✅通过':'❌未通过')+'</td><td>'+time+'</td></tr>';
+        tbody.innerHTML += tr;
+      });
+      document.getElementById('totalCount').textContent = total;
+      document.getElementById('passCount').textContent = pass;
+      document.getElementById('failCount').textContent = fail;
+      document.getElementById('avgScore').textContent = total>0 ? Math.round(sumScore/total) : 0;
+    })
+    .catch(function(e){
+      document.getElementById('tbody').innerHTML = '<tr><td colspan="7" style="color:#e74c3c">⚠️ 加载失败，请刷新页面重试</td></tr>';
+    });
+}
+loadData();
+setInterval(loadData, 300000);
+</script>
+</body>
+</html>
