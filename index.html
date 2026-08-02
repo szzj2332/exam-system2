@@ -8,79 +8,137 @@
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:sans-serif;background:#f0f2f5;padding:20px}
 .container{max-width:800px;margin:0 auto;background:#fff;border-radius:16px;padding:30px}
-h1{text-align:center;font-size:24px;margin-bottom:20px}
+h1{text-align:center;font-size:24px;margin-bottom:5px}
+.sub{text-align:center;color:#888;font-size:14px;margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:15px}
 .form-field{margin-bottom:12px}
 .form-field label{display:block;font-size:14px;margin-bottom:4px;font-weight:600}
-.form-field input,.form-field select{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:16px}
+.form-field input{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:16px}
 .btn{display:block;width:100%;padding:14px;background:#1a73e8;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;margin-top:10px}
 .btn:disabled{background:#aaa}
-.status{background:#f8f9fa;padding:15px;border-radius:10px;margin:15px 0}
+.score-info{background:#f0f6ff;padding:12px 15px;border-radius:10px;margin:15px 0;font-size:13px;line-height:1.6;color:#333}
+.timer{background:#fff8e1;padding:12px;border-radius:8px;margin:15px 0;text-align:center;font-size:16px;font-weight:700;display:none}
+.timer.warning{color:#e74c3c}
 .q-card{background:#fafbfc;border:1px solid #e8eaed;border-radius:12px;padding:16px;margin-bottom:15px}
+.q-header{display:flex;justify-content:space-between;margin-bottom:8px}
+.q-type{font-size:13px;padding:2px 8px;border-radius:4px;color:#fff}
+.q-type.s{background:#1a73e8}
+.q-type.m{background:#e67e22}
+.q-type.j{background:#27ae60}
+.q-score{font-size:13px;color:#888}
 .q-stem{font-size:15px;margin-bottom:10px}
-.options label{display:flex;gap:10px;padding:10px;margin:5px 0;border:1px solid #e8eaed;border-radius:8px;cursor:pointer}
+.options label{display:flex;gap:10px;padding:10px;margin:5px 0;border:1px solid #e8eaed;border-radius:8px;cursor:pointer;font-size:14px}
 .fb{margin-top:8px;padding:8px;border-radius:8px;font-size:14px}
 .fb.correct{background:#e6f7e6}
 .fb.wrong{background:#fde8e8}
-#resultPanel{display:none;margin-top:20px}
-#debugInfo{display:none}
+#resultPanel{display:none;margin-top:20px;text-align:center}
+#resultPanel h2{font-size:22px;margin-bottom:15px}
+#scoreDisplay{font-size:42px;font-weight:700;margin:15px 0}
+#scoreDisplay.pass{color:#27ae60}
+#scoreDisplay.fail{color:#e74c3c}
+#resultDetail{font-size:15px;color:#666;margin:10px 0}
 </style>
 </head>
 <body>
 <div class="container">
 <h1>消防实操12条考试</h1>
+<div class="sub">满分100分 · 98分及格 · 90题 · 35分钟</div>
+
+<div class="score-info">
+<b>40</b> 道单选题 每题 <b>1</b> 分 = <b>40</b> 分 &nbsp;·&nbsp;
+<b>10</b> 道多选题 每题 <b>2</b> 分 = <b>20</b> 分 &nbsp;·&nbsp;
+<b>40</b> 道判断题 每题 <b>1</b> 分 = <b>40</b> 分<br>
+<span style="color:#e74c3c">⏱ 考试时间 35 分钟 · 超时自动交卷</span>
+</div>
+
 <div class="form-field">
 <label>姓名</label>
 <input id="name">
 </div>
 <div class="form-field">
-<label>园区</label>
+<label>所在园区</label>
 <input id="park">
 </div>
 <div class="form-field">
-<label>岗位</label>
+<label>岗位名称</label>
 <input id="role">
 </div>
-<button class="btn" id="startBtn" onclick="start()">开始考试</button>
-<div class="status" id="info"></div>
+<button class="btn" id="startBtn" onclick="start()">📝 开始考试</button>
+
+<div class="timer" id="timer"></div>
+
 <div id="q_area" style="display:none">
 <div id="q_list"></div>
-<button class="btn" id="submitBtn" onclick="submit()">提交</button>
+<button class="btn" id="submitBtn" onclick="submit()">📤 提交答卷</button>
 </div>
+
 <div id="resultPanel">
 <h2 id="r_title"></h2>
-<div id="r_score" style="font-size:36px;text-align:center"></div>
-<div id="r_detail"></div>
+<div id="scoreDisplay"></div>
+<div id="resultDetail"></div>
+<button class="btn" onclick="location.reload()">🔄 重新考试</button>
 </div>
 </div>
-<div style="text-align:center;color:#999;font-size:12px;margin-top:20px" id="footer"></div>
+<div style="text-align:center;color:#ccc;font-size:11px;margin-top:20px">消防实操12条考试 · 2026-08-02</div>
 
 <script>
 var Q = {"title": "消防实操12条考试", "totalScore": 100, "passScore": 98, "timeLimit": 35, "maxAttempts": 3, "deadline": "2026-08-30 00:00", "questions": [{"id": 1, "type": "single", "stem": "消防主机处于正常监视状态时，显示屏应显示什么？", "options": ["A. 系统故障", "B. 系统正常运行", "C. 火警等待确认", "D. 待机中"], "answer": 1, "score": 1}, {"id": 2, "type": "single", "stem": "海湾消防主机调取火警/故障记录的按键顺序是？", "options": ["A. 功能-查询-查询历史记录", "B. 菜单-记录查询-火警/故障记录查询", "C. 设置-系统信息-火警记录", "D. 查询-报警记录-火警查询"], "answer": 1, "score": 1}, {"id": 3, "type": "single", "stem": "青鸟消防主机调取历史记录的操作路径是？", "options": ["A. 菜单-记录查询", "B. 功能-查询-查询历史记录-火警/故障", "C. 设置-历史记录", "D. 系统-报警查询"], "answer": 1, "score": 1}, {"id": 4, "type": "single", "stem": "在消防主机上校对系统时间应在哪个界面操作？", "options": ["A. 系统设置-密码修改", "B. 用户设置-日期时间设置", "C. 记录查询-时间校准", "D. 设备管理-时钟同步"], "answer": 1, "score": 1}, {"id": 5, "type": "single", "stem": "应急广播处于正常工作状态时运行指示灯的颜色是？", "options": ["A. 红色常亮", "B. 绿色常亮", "C. 黄色闪烁", "D. 蓝色闪烁"], "answer": 1, "score": 1}, {"id": 6, "type": "single", "stem": "消防应急广播测试至少需要几人配合？", "options": ["A. 1人", "B. 2人", "C. 3人", "D. 4人"], "answer": 1, "score": 1}, {"id": 7, "type": "single", "stem": "播放指定分区应急广播前需确认消防主机总线盘处于什么状态？", "options": ["A. 自动禁止", "B. 自动允许", "C. 手动允许", "D. 手动禁止"], "answer": 2, "score": 1}, {"id": 8, "type": "single", "stem": "消防电话总机正常运行时面板绿色指示灯状态是？", "options": ["A. 闪烁", "B. 常亮", "C. 熄灭", "D. 交替闪烁"], "answer": 1, "score": 1}, {"id": 9, "type": "single", "stem": "消防电话分机正常运行时指示灯颜色是？", "options": ["A. 绿色常亮", "B. 黄色闪烁", "C. 红色闪亮", "D. 蓝色常亮"], "answer": 2, "score": 1}, {"id": 10, "type": "single", "stem": "消防电话总机拨打分机时需要输入什么？", "options": ["A. 分机编号和密码", "B. 仅密码", "C. 仅分机编号", "D. 总机编号和密码"], "answer": 0, "score": 1}, {"id": 11, "type": "single", "stem": "消防主机主电断开后备用电源指示灯应在多长时间内亮起？", "options": ["A. 1-2秒", "B. 3-10秒", "C. 15-30秒", "D. 30秒以上"], "answer": 1, "score": 1}, {"id": 12, "type": "single", "stem": "消防主机主电断开后显示屏应提示什么信息？", "options": ["A. 系统正常运行", "B. 主电故障和备用电源工作", "C. 通信故障", "D. 设备离线"], "answer": 1, "score": 1}, {"id": 13, "type": "single", "stem": "消防主机主电断电时按下哪个键可消除蜂鸣提示音？", "options": ["A. 复位键", "B. 消音键", "C. 确认键", "D. 静音键"], "answer": 1, "score": 1}, {"id": 14, "type": "single", "stem": "监控存储时间的最低要求是多少天？", "options": ["A. 15天", "B. 20天", "C. 30天", "D. 45天"], "answer": 2, "score": 1}, {"id": 15, "type": "single", "stem": "海康监控调取录像回放的操作路径是？", "options": ["A. 右键-录像回放", "B. 主菜单-回放-普通回放", "C. 系统设置-录像查询", "D. 设备管理-录像检索"], "answer": 1, "score": 1}, {"id": 16, "type": "single", "stem": "大华监控调取录像回放的操作方式是？", "options": ["A. 主菜单-回放", "B. 右键单击画面-录像回放", "C. 双击画面-回放", "D. 系统设置-录像"], "answer": 1, "score": 1}, {"id": 17, "type": "single", "stem": "消防泵远程启动测试前多线盘应处于什么状态？", "options": ["A. 自动允许", "B. 手动允许", "C. 手动禁止", "D. 全部自动"], "answer": 1, "score": 1}, {"id": 18, "type": "single", "stem": "消防泵远程启动前管网压力参考值应为多少？", "options": ["A. 0.15-0.35mPa", "B. 0.35-0.65mPa", "C. 0.65-1.0mPa", "D. 1.0-1.5mPa"], "answer": 1, "score": 1}, {"id": 19, "type": "single", "stem": "按下消防泵启动按键后启动指示灯闪烁表示什么？", "options": ["A. 水泵已启动", "B. 启动信号已发出", "C. 水泵故障", "D. 按键损坏"], "answer": 1, "score": 1}, {"id": 20, "type": "single", "stem": "发电机空载测试前蓄电池电压应大于多少？", "options": ["A. 12V", "B. 24V", "C. 36V", "D. 48V"], "answer": 1, "score": 1}, {"id": 21, "type": "single", "stem": "发电机空载运行时操作人员应佩戴什么？", "options": ["A. 安全帽", "B. 降噪耳机或耳塞", "C. 防护手套", "D. 护目镜"], "answer": 1, "score": 1}, {"id": 22, "type": "single", "stem": "发电机空载运行稳定后方可填写参数通常需要运行多久？", "options": ["A. 大于1分钟", "B. 大于3分钟", "C. 大于5分钟", "D. 大于10分钟"], "answer": 2, "score": 1}, {"id": 23, "type": "single", "stem": "发电机空载运行的最低时间要求是？", "options": ["A. 不低于3分钟", "B. 不低于5分钟", "C. 不低于10分钟", "D. 不低于15分钟"], "answer": 1, "score": 1}, {"id": 24, "type": "single", "stem": "消火栓正面多少米范围内不得有堆放杂物或障碍物？", "options": ["A. 0.5米", "B. 1.0米", "C. 1.5米", "D. 2.0米"], "answer": 2, "score": 1}, {"id": 25, "type": "single", "stem": "消火栓出水测试需要至少几人配合？", "options": ["A. 2人", "B. 3人", "C. 4人", "D. 5人"], "answer": 2, "score": 1}, {"id": 26, "type": "single", "stem": "消火栓出水测试要求多少分钟内出水？", "options": ["A. 1分钟", "B. 2分钟", "C. 3分钟", "D. 5分钟"], "answer": 2, "score": 1}, {"id": 27, "type": "single", "stem": "消火栓出水测试要求充实水柱高度不低于多少米？", "options": ["A. 5米", "B. 8米", "C. 10米", "D. 12米"], "answer": 2, "score": 1}, {"id": 28, "type": "single", "stem": "防火卷帘测试前消防主机总线盘应处于什么状态？", "options": ["A. 自动允许", "B. 手动允许", "C. 手动禁止", "D. 全部自动"], "answer": 1, "score": 1}, {"id": 29, "type": "single", "stem": "通过消防主机地址码启动防火卷帘应在哪个界面操作？", "options": ["A. 系统设置", "B. 总线控制-防火卷帘分区", "C. 设备管理", "D. 报警记录"], "answer": 1, "score": 1}, {"id": 30, "type": "single", "stem": "防火卷帘测试至少需要几人配合？", "options": ["A. 1人", "B. 2人", "C. 3人", "D. 4人"], "answer": 1, "score": 1}, {"id": 31, "type": "single", "stem": "排烟风机/天窗测试前风机控制柜应处于什么状态？", "options": ["A. 手动", "B. 自动", "C. 停止", "D. 关闭"], "answer": 1, "score": 1}, {"id": 32, "type": "single", "stem": "天窗开启角度的通常要求是多少？", "options": ["A. 30度", "B. 50度", "C. 70度", "D. 90度"], "answer": 2, "score": 1}, {"id": 33, "type": "single", "stem": "通过消防主机地址码启动排烟风机应在哪个界面操作？", "options": ["A. 系统设置-风机控制", "B. 总线控制-防排烟分区", "C. 设备管理-排烟", "D. 报警记录-风机"], "answer": 1, "score": 1}, {"id": 34, "type": "single", "stem": "湿式喷淋系统末端试水压力表的参考压力值范围是？", "options": ["A. 0.03-0.05mPa", "B. 0.15-0.65mPa", "C. 0.35-0.65mPa", "D. 0.65-1.0mPa"], "answer": 1, "score": 1}, {"id": 35, "type": "single", "stem": "预作用喷淋系统联动测试中双连锁系统需要触发哪些信号？", "options": ["A. 1个手报即可", "B. 1个烟感即可", "C. 1个手报加1个火灾探测器", "D. 2个手报"], "answer": 2, "score": 1}, {"id": 36, "type": "single", "stem": "预作用系统联动测试中双连锁系统还需调整什么设备？", "options": ["A. 水力警铃", "B. 电接压力表下限报警值", "C. 水流指示器", "D. 信号蝶阀"], "answer": 1, "score": 1}, {"id": 37, "type": "single", "stem": "预作用系统第三腔开始泄水后压力下降时会发生什么？", "options": ["A. 系统自动关闭", "B. 供水侧开始上水", "C. 主机复位报警", "D. 水力警铃停止"], "answer": 1, "score": 1}, {"id": 38, "type": "single", "stem": "应急跑点测试中跑点人员最晚应在几分钟内抵达现场？", "options": ["A. 1分钟", "B. 2分钟", "C. 3分钟", "D. 5分钟"], "answer": 2, "score": 1}, {"id": 39, "type": "single", "stem": "从按下手报到完成消防主机复位应在几分钟内完成？", "options": ["A. 3分钟", "B. 5分钟", "C. 8分钟", "D. 10分钟"], "answer": 1, "score": 1}, {"id": 40, "type": "single", "stem": "跑点人员需携带的工具中不包括以下哪项？", "options": ["A. 灭火器", "B. 复位钥匙", "C. 消防水带", "D. 对讲机"], "answer": 2, "score": 1}, {"id": 41, "type": "multiple", "stem": "消防主机操作测试中需要确认的内容包括哪些？（多选）", "options": ["A. 中控员的中级监控证真实有效且人证相符", "B. 主机前无遮挡无杂物", "C. 消防主机处于正常监视状态", "D. 灭火器压力充足"], "answer": [0, 1, 2], "score": 2}, {"id": 42, "type": "multiple", "stem": "播放指定库内分区应急广播的操作步骤包括哪些？（多选）", "options": ["A. 确认总线盘手动允许", "B. 按下指定位置广播开关并输入密码", "C. 摘话筒人工喊话3遍", "D. 直接按警铃按钮"], "answer": [0, 1, 2], "score": 2}, {"id": 43, "type": "multiple", "stem": "消防电话分机测试的合格标准包括哪些？（多选）", "options": ["A. 主机可拨打至选定分机响铃正常", "B. 通话声音清晰", "C. 分机拿起后总机屏幕显示对应位置", "D. 分机必须有视频显示"], "answer": [0, 1, 2], "score": 2}, {"id": 44, "type": "multiple", "stem": "主备电切换测试前应确认的内容包括哪些？（多选）", "options": ["A. 主电指示灯常亮", "B. 备用电源接线牢固无破损漏液", "C. 备用电源电压为24V（参考）", "D. 所有灭火器已检查"], "answer": [0, 1], "score": 2}, {"id": 45, "type": "multiple", "stem": "监控画面调取测试的合格标准包括哪些？（多选）", "options": ["A. 值班人员熟练调取实时画面", "B. 可调取30天内任一画面", "C. 监控存储时间大于等于30天", "D. 监控画面可放大缩小"], "answer": [0, 1, 2], "score": 2}, {"id": 46, "type": "multiple", "stem": "消防泵启泵测试需要确认的内容包括哪些？（多选）", "options": ["A. 多线盘手动允许状态", "B. 管网压力满足条件", "C. 消防控制柜处于自动状态", "D. 消防泵已停机超过24小时"], "answer": [0, 1, 2], "score": 2}, {"id": 47, "type": "multiple", "stem": "发电机空载测试前应检查的项目包括哪些？（多选）", "options": ["A. 机油液位在上下限之间", "B. 冷却液清澈无油污", "C. 燃油油量50%-80%", "D. 发电机已运行超过100小时"], "answer": [0, 1, 2], "score": 2}, {"id": 48, "type": "multiple", "stem": "消火栓出水测试的人员配置包括哪些岗位？（多选）", "options": ["A. 中控室1人", "B. 消防泵房1人", "C. 消火栓旁2人", "D. 园区经理1人"], "answer": [0, 1, 2], "score": 2}, {"id": 49, "type": "multiple", "stem": "防火卷帘测试前应确认的内容包括哪些？（多选）", "options": ["A. 卷帘门控制盒处于解锁状态", "B. 卷帘门帘布完好平整无破损", "C. 卷帘门下方无堆物", "D. 卷帘门轨道已上油"], "answer": [0, 1, 2], "score": 2}, {"id": 50, "type": "multiple", "stem": "排烟风机/天窗远程启动的方法包括哪些？（多选）", "options": ["A. 总线盘启动解锁后按分区按钮", "B. 地址码启动在防排烟分区勾选目标", "C. 直接按现场警铃触发", "D. 通过消防主机多线盘停止键复位"], "answer": [0, 1], "score": 2}, {"id": 51, "type": "judge", "stem": "消防主机操作测试完毕后应将消防主机恢复到自动/手动允许状态。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 52, "type": "judge", "stem": "消防主机的控制状态可以通过液晶显示屏及钥匙位置进行识别。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 53, "type": "judge", "stem": "应急广播测试前无需与测试区域内客户提前沟通。", "options": ["正确", "错误"], "answer": 1, "score": 1}, {"id": 54, "type": "judge", "stem": "应急广播人工喊话内容为请注意这是广播测试需重复三遍。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 55, "type": "judge", "stem": "应急广播测试完毕后查看主机反馈信息与实际位置是否一致是现场恢复工作之一。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 56, "type": "judge", "stem": "消防电话分机的地址编码表应当贴于总机附件且打印清晰。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 57, "type": "judge", "stem": "消防电话测试只需要1人在中控室即可完成。", "options": ["正确", "错误"], "answer": 1, "score": 1}, {"id": 58, "type": "judge", "stem": "消防电话通话后可通过直接挂机的方式正常结束通话。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 59, "type": "judge", "stem": "消防主机主电恢复后将主电开关扳回闭合状态主电指示灯会重新亮起。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 60, "type": "judge", "stem": "主备电切换测试中备用电源蓄电池无需检查是否破损漏液。", "options": ["正确", "错误"], "answer": 1, "score": 1}, {"id": 61, "type": "judge", "stem": "主电断开后主机发出提示音是正常现象需使用消音键消除。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 62, "type": "judge", "stem": "监控调取前需确认监控实时时间与北京时间误差小于5分钟。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 63, "type": "judge", "stem": "监控回放时日历上标记为红色的日期表示该日期有录像。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 64, "type": "judge", "stem": "监控调取测试完毕后不需要退出回放界面。", "options": ["正确", "错误"], "answer": 1, "score": 1}, {"id": 65, "type": "judge", "stem": "消防泵启动后约30秒内反馈指示灯常亮表示水泵已启动并返回信号。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 66, "type": "judge", "stem": "消防泵启泵测试只需要1人在中控室操作即可。", "options": ["正确", "错误"], "answer": 1, "score": 1}, {"id": 67, "type": "judge", "stem": "消防泵测试结束后泵房人员应将控制柜恢复至自动状态。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 68, "type": "judge", "stem": "发电机机油如出现乳白色乳化属于正常现象。", "options": ["正确", "错误"], "answer": 1, "score": 1}, {"id": 69, "type": "judge", "stem": "发电机空载测试操作过程中需要边操作边口述。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 70, "type": "judge", "stem": "发电机蓄电池观察孔为绿色表示状态正常。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 71, "type": "judge", "stem": "消火栓出水时水带应在1分钟内完成连接且无弯折扭曲。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 72, "type": "judge", "stem": "灭火时身体应呈弓步一手压水枪一手托水带。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 73, "type": "judge", "stem": "室外地上消火栓也有启泵按钮需要按下。", "options": ["正确", "错误"], "answer": 1, "score": 1}, {"id": 74, "type": "judge", "stem": "防火卷帘测试结果要求远程控制卷帘门正常升降无卡顿落地与地面无缝隙。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 75, "type": "judge", "stem": "防火卷帘启动后启动指示灯与反馈指示灯都会亮起。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 76, "type": "judge", "stem": "防火卷帘测试前不需要与客户提前沟通。", "options": ["正确", "错误"], "answer": 1, "score": 1}, {"id": 77, "type": "judge", "stem": "排烟风机测试只需在库内手动操作即可无需中控室配合。", "options": ["正确", "错误"], "answer": 1, "score": 1}, {"id": 78, "type": "judge", "stem": "现场手动操作排烟风机时先将控制柜调至手动再按下启动按键。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 79, "type": "judge", "stem": "排烟风机天窗测试结束后控制柜箱应恢复至自动状态。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 80, "type": "judge", "stem": "湿式喷淋系统联动测试要求喷淋泵能自动启动。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 81, "type": "judge", "stem": "预作用系统测试前需确认系统是单联锁还是双联锁。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 82, "type": "judge", "stem": "预作用系统联动启动是推荐使用的方法。", "options": ["正确", "错误"], "answer": 1, "score": 1}, {"id": 83, "type": "judge", "stem": "喷淋联动测试结束后消防主机需要复位报警信息。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 84, "type": "judge", "stem": "喷淋联动测试中水力警铃应响亮震耳为正常现象。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 85, "type": "judge", "stem": "跑点测试前需确认消防手报组件完好且运行指示灯闪亮。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 86, "type": "judge", "stem": "拨打119报警时需报告园区地址报警人信息起火原因火势大小等。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 87, "type": "judge", "stem": "火情较大时中控室人员应将消防主机保持手动状态。", "options": ["正确", "错误"], "answer": 1, "score": 1}, {"id": 88, "type": "judge", "stem": "火灾误报时巡逻岗确认为误报后主机复位即完成处理。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 89, "type": "judge", "stem": "火情较小时使用灭火器可灭火不需启动应急预案。", "options": ["正确", "错误"], "answer": 0, "score": 1}, {"id": 90, "type": "judge", "stem": "打119报警需说清楚地址报警人原因火势燃烧物及有无人员被困。", "options": ["正确", "错误"], "answer": 0, "score": 1}]};
 
+var timerInterval;
+var remaining;
+
 function start(){
-  document.getElementById('info').innerHTML = 'JS已加载，题目数:' + Q.questions.length;
-  var n = document.getElementById('name').value;
-  var p = document.getElementById('park').value;
-  var r = document.getElementById('role').value;
-  if(!n||!p||!r){alert('请填写完整信息');return}
+  var n=document.getElementById('name').value.trim();
+  var p=document.getElementById('park').value.trim();
+  var r=document.getElementById('role').value.trim();
+  if(!n||!p||!r){alert('请完整填写考生信息');return}
   
+  document.getElementById('startBtn').disabled=true;
   document.getElementById('q_area').style.display='block';
-  var list = document.getElementById('q_list');
+  
+  var list=document.getElementById('q_list');
   list.innerHTML='';
   Q.questions.forEach(function(q,i){
-    var types={single:'单选',multiple:'多选',judge:'判断'};
-    var card='<div class="q-card"><div>'+ (i+1) +'.'+ types[q.type] +' ('+q.score+'分)</div><div class="q-stem">'+q.stem+'</div><div class="options">';
+    var typeLabels={single:'单选',multiple:'多选',judge:'判断'};
+    var typeClasses={single:'s',multiple:'m',judge:'j'};
+    var card='<div class="q-card">'+
+      '<div class="q-header">'+
+      '<span class="q-type '+typeClasses[q.type]+'">'+typeLabels[q.type]+'</span>'+
+      '<span class="q-score">'+q.score+' 分</span>'+
+      '</div>'+
+      '<div class="q-stem">'+(i+1)+'. '+q.stem+'</div><div class="options">';
     q.options.forEach(function(o,j){
-      card += '<label><input type="'+(q.type=='judge'?'radio':'checkbox')+'" name="q'+i+'" value="'+j+'">'+ o +'</label>';
+      card += '<label><input type="'+(q.type=='judge'?'radio':'checkbox')+'" name="q'+i+'" value="'+j+'"> '+ o +'</label>';
     });
     card += '</div><div class="fb" id="fb'+i+'"></div></div>';
     list.innerHTML+=card;
   });
-  document.getElementById('footer').textContent='共 '+Q.questions.length+' 题';
+  
+  var timer=document.getElementById('timer');
+  timer.style.display='block';
+  remaining=Q.timeLimit*60;
+  updateTimer();
+  timerInterval=setInterval(function(){
+    remaining--;
+    updateTimer();
+    if(remaining<=0){
+      clearInterval(timerInterval);
+      alert('时间到！自动交卷');
+      submit();
+    }
+  },1000);
+}
+
+function updateTimer(){
+  var m=Math.floor(remaining/60);
+  var s=remaining%60;
+  var t=document.getElementById('timer');
+  t.innerHTML='⏱ 剩余时间：'+m+'分'+(s<10?'0':'')+s+'秒';
+  t.className='timer'+(remaining<300?' warning':'');
 }
 
 function submit(){
-  if(!confirm('确认提交？'))return;
+  if(!confirm('确认提交答卷？'))return;
+  clearInterval(timerInterval);
   var score=0,correct=0,wrong=0;
   Q.questions.forEach(function(q,i){
     var ans=[];
@@ -92,16 +150,25 @@ function submit(){
       ans=Array.from(checks).map(function(c){return parseInt(c.value)});
     }
     var isCorrect=false;
-    if(q.type=='single'||q.type=='judge'){isCorrect=ans.length==1&&ans[0]==q.answer}
-    else{isCorrect=ans.sort().join()==[].concat(q.answer).sort().join()}
+    if(q.type=='single'||q.type=='judge'){
+      isCorrect=ans.length==1&&ans[0]==q.answer;
+    }else{
+      var correctA=[].concat(q.answer);
+      isCorrect=ans.length==correctA.length&&ans.every(function(v){return correctA.indexOf(v)>=0});
+    }
     var fb=document.getElementById('fb'+i);
     if(isCorrect){score+=q.score;correct++;fb.className='fb correct';fb.textContent='✓ 正确'}
     else{wrong++;fb.className='fb wrong';fb.textContent='✗ 错误，正确答案:'+(q.type=='judge'?(q.answer?'错误':'正确'):q.options[q.answer])}
   });
-  document.getElementById('resultPanel').style.display='block';
-  document.getElementById('r_title').textContent=score>=98?'恭喜通过':'未通过';
-  document.getElementById('r_score').textContent=score+'分';
-  document.getElementById('r_detail').innerHTML='正确:'+correct+' 错误:'+wrong+' 共'+Q.questions.length+'题';
+  document.getElementById('submitBtn').disabled=true;
+  
+  var rp=document.getElementById('resultPanel');
+  rp.style.display='block';
+  document.getElementById('r_title').textContent=score>=Q.passScore?'🎉 恭喜通过！':'😢 未通过（需'+Q.passScore+'分）';
+  var sd=document.getElementById('scoreDisplay');
+  sd.textContent=score+' 分';
+  sd.className=score>=Q.passScore?'pass':'fail';
+  document.getElementById('resultDetail').innerHTML='正确 '+correct+' 题 | 错误 '+wrong+' 题 | 共 '+Q.questions.length+' 题';
 }
 </script>
 </body>
