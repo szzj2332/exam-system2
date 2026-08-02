@@ -1267,6 +1267,8 @@ const EXAM_DATA = {
   ]
 };
 
+
+
 // 验证：计算总分
 let totalScore = 0;
 EXAM_DATA.questions.forEach(q => { totalScore += q.score; });
@@ -1404,17 +1406,7 @@ async function submitExam() {
     correctCount: 0,
     wrongCount: 0
   };
-  const reportData = {
-    name: studentInfo.name,
-    park: studentInfo.park,
-    role: studentInfo.role,
-    answers: EXAM_DATA.questions.map((q, idx) => {
-      const sel = document.querySelector(`input[name="q${idx}"]:checked`);
-      return sel ? parseInt(sel.value) : -1;
-    }),
-    correctCount: 0,
-    wrongCount: 0
-  };
+
   let score = 0;
   let correct = 0;
   let wrong = 0;
@@ -1461,7 +1453,7 @@ async function submitExam() {
   document.getElementById('correctCount').textContent = correct;
   document.getElementById('wrongCount').textContent = wrong;
   document.getElementById('wrongDetail').textContent = 
-    `⚠ 错误率：${Math.round(wrong/30*100)}% (${wrong}/30题)`;
+    `⚠ 错误率：${Math.round(wrong/90*100)}% (${wrong}/30题)`;
   
   const passText = score >= EXAM_DATA.passScore ? '🎉 恭喜通过！' : '😢 未通过（需≥98分）';
   document.getElementById('resultTitle').textContent = passText;
