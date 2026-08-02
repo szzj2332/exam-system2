@@ -20,7 +20,6 @@ h1{text-align:center;font-size:24px;margin-bottom:5px}
 .q-card{background:#fafbfc;border:1px solid #e8eaed;border-radius:12px;padding:16px;margin-bottom:15px}
 .q-header{display:flex;justify-content:space-between;margin-bottom:8px}
 .q-typetag{font-size:13px;padding:2px 8px;border-radius:4px;color:#fff}
-.q-scoret{font-size:13px;color:#888}
 .q-stem{font-size:15px;margin-bottom:10px}
 .options label{display:flex;gap:10px;padding:10px;margin:5px 0;border:1px solid #e8eaed;border-radius:8px;cursor:pointer;font-size:14px}
 .fb{margin-top:8px;padding:8px;border-radius:8px;font-size:14px}
@@ -131,10 +130,24 @@ function submit(){
   });
   document.getElementById('submitBtn').disabled=true;
 
-  // 上报考试结果
-  var rec = {name:document.getElementById('name').value,park:document.getElementById('park').value,role:document.getElementById('role').value,score:score,total:Q.totalScore,result:score>=98?'通过':'未通过',correct:correct,wrong:wrong,time:new Date().toLocaleString()};
-  fetch('https://webhook.site/e7d85735-fcb6-49b7-ae64-84c0a84d8875',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(rec)});
-  try{localStorage.setItem('exam_last',JSON.stringify(rec))}catch(e){}
+  // 上报：先用fetch试，失败了就用img打点
+  try{
+    var data = new FormData();
+    data.append('name',document.getElementById('name').value);
+    data.append('park',document.getElementById('park').value);
+    data.append('role',document.getElementById('role').value);
+    data.append('score',score);
+    data.append('total',Q.totalScore);
+    data.append('result',score>=98?'通过':'未通过');
+    data.append('correct',correct);
+    data.append('wrong',wrong);
+    data.append('time',new Date().toLocaleString());
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST','https://webhook.site/e7d85735-fcb6-49b7-ae64-84c0a84d8875',true);
+    xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+    var params = 'name='+encodeURIComponent(data.get('name'))+'&park='+encodeURIComponent(data.get('park'))+'&role='+encodeURIComponent(data.get('role'))+'&score='+score+'&total='+Q.totalScore+'&result='+encodeURIComponent(data.get('result'))+'&correct='+correct+'&wrong='+wrong+'&time='+encodeURIComponent(data.get('time'));
+    xhr.send(params);
+  }catch(e){}
 
   var rp=document.getElementById('resultPanel');
   rp.style.display='block';
