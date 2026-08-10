@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文员专项培训——消防12条/消防跑点</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Microsoft YaHei','PingFang SC','Helvetica Neue',sans-serif;background:#f0f2f5;min-height:100vh;display:flex;justify-content:center;padding:20px}
+.container{max-width:800px;width:100%;background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.08);padding:30px 35px;margin:20px auto}
+h1{text-align:center;font-size:24px;color:#1a1a2e;margin-bottom:8px;font-weight:700}
+.subtitle{text-align:center;color:#888;font-size:14px;margin-bottom:20px;border-bottom:1px solid #eee;padding-bottom:15px}
+
+/* 考生信息表单 */
+.info-form{background:#f8f9fa;border-radius:12px;padding:20px;margin-bottom:20px;display:block}
+.info-form h3{font-size:16px;color:#1a1a2e;margin-bottom:15px;border-bottom:2px solid #1a73e8;padding-bottom:8px;display:inline-block}
+.form-row{display:flex;gap:15px;flex-wrap:wrap;margin-bottom:12px}
+.form-field{flex:1;min-width:180px}
+.form-field label{display:block;font-size:13px;color:#666;margin-bottom:4px;font-weight:600}
+.form-field input{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;outline:none;transition:border .2s}
+.form-field input:focus{border-color:#1a73e8}
+.form-field select{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;outline:none;background:#fff}
+.btn-start{display:block;width:100%;padding:12px;background:#1a73e8;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;margin-top:8px}
+.btn-start:hover{background:#1557b0}
+.btn-start:disabled{background:#aaa;cursor:not-allowed}
+
+/* 信息栏 */
+.status-bar{background:#f8f9fa;border-radius:10px;padding:15px 20px;margin:15px 0;display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;font-size:14px}
+.status-bar .item{display:flex;align-items:center;gap:6px;color:#555}
+.status-bar .item strong{color:#1a1a2e}
+.timer-bar{background:#fff8e1;border-radius:8px;padding:12px 18px;margin:10px 0;text-align:center;border:1px solid #ffe082;display:none}
+.timer-bar .timer-text{font-size:18px;font-weight:700;color:#333}
+.timer-bar .timer-text.warning{color:#e74c3c;animation:pulse 1s infinite}
+
+/* 题目 */
+.q-list{display:flex;flex-direction:column;gap:18px;margin-top:20px}
+.q-card{background:#fafbfc;border:1px solid #e8eaed;border-radius:12px;padding:18px 20px}
+.q-card .q-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.q-card .q-num{font-weight:700;color:#1a73e8;font-size:15px;min-width:35px}
+.q-card .q-badge{padding:3px 10px;border-radius:4px;font-size:12px;font-weight:600;color:#fff;border-radius:4px}
+.q-single{background:#1a73e8}.q-multiple{background:#e67e22}.q-judge{background:#27ae60}
+.q-card .q-score{font-size:13px;color:#888;white-space:nowrap}
+.q-card .q-stem{font-size:15px;line-height:1.6;margin-bottom:12px;color:#222}
+.q-card .options{display:flex;flex-direction:column;gap:8px}
+.q-card .options label{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:8px;background:#fff;border:1px solid #e8eaed;cursor:pointer;transition:all .2s;line-height:1.4}
+.q-card .options label:hover{border-color:#1a73e8;background:#f0f6ff}
+.q-card .options label input[type=radio],.q-card .options label input[type=checkbox]{accent-color:#1a73e8;margin-top:3px}
+
+/* 判分反馈 */
+.q-card .fb{display:none;margin-top:10px;padding:10px 14px;border-radius:8px;font-size:14px}
+.q-card .fb.correct{background:#e6f7e6;color:#1a7a1a;border:1px solid #b3e0b3}
+.q-card .fb.wrong{background:#fde8e8;color:#c0392b;border:1px solid #f5c6c5;display:block}
+.q-card .fb .correct-ans{color:#1a73e8;font-weight:600}
+
+/* 提交 */
+.submit-area{text-align:center;margin:25px 0}
+.btn-submit{padding:14px 50px;font-size:18px;border-radius:10px;border:none;background:#1a73e8;color:#fff;font-weight:700;cursor:pointer;transition:all .2s}
+.btn-submit:hover{background:#1557b0}
+.btn-submit:disabled{background:#aaa;cursor:not-allowed}
+
+/* 结果 */
+.result-panel{display:none;margin-top:25px;background:#f8f9fa;border-radius:12px;padding:25px;text-align:center}
+.result-panel .score-big{font-size:48px;font-weight:800;margin:10px 0}
+.result-panel .score-big.pass{color:#27ae60}.result-panel .score-big.fail{color:#e74c3c}
+.result-panel .detail{font-size:16px;color:#555;margin:8px 0}
+.result-panel .stat{display:flex;gap:20px;justify-content:center;margin:15px 0}
+
+@keyframes pulse{50%{opacity:.4}}
+</style>
+</head>
+<body>
+
+<div class="container" id="app">
+  <h1>🏆 文员专项培训——消防12条/消防跑点</h1>
+  <div class="subtitle">基于《品质检查要点-分岗位》文员岗位品质标准</div>
+
+  <!-- 考生信息表单 -->
+  <div class="info-form">
+    <h3>📝 考生信息</h3>
+    <div class="form-row">
+      <div class="form-field">
+        <label>姓名 <span style="color:#e74c3c">*</span></label>
+        <input type="text" id="studentName" placeholder="请输入姓名" required>
+      </div>
+      <div class="form-field">
+        <label>所在园区 <span style="color:#e74c3c">*</span></label>
+        <input type="text" id="studentPark" placeholder="如：上海宝山园区" required>
+      </div>
+      <div class="form-field">
+        <label>岗位名称 <span style="color:#e74c3c">*</span></label>
+        <input type="text" id="studentRole" placeholder="如：安管员/保安主管" required>
+      </div>
+    </div>
+    <button class="btn-start" id="startBtn" onclick="startExam()">📝 开始考试</button>
+  </div>
+
+  <!-- 状态 -->
+  <div class="status-bar" id="statusBar" style="display:none">
+    <div class="item">👤 考生：<strong id="showName">—</strong></div>
+    <div class="item">🏢 园区：<strong id="showPark">—</strong></div>
+    <div class="item">💼 岗位：<strong id="showRole">—</strong></div>
+    <div class="item">📊 已考 <strong id="attemptNum">0/3</strong> 次</div>
+  </div>
+
+  <div class="timer-bar" id="timerBar">
+    <span class="timer-text" id="timerText">⏱ 剩余时间：45分00秒</span>
+  </div>
+
+  <!-- 题目区 -->
+  <div id="questionArea" style="display:none">
+    <div class="q-list" id="questionList"></div>
+    <div class="submit-area">
+      <button class="btn-submit" id="submitBtn" onclick="submitExam()">📤 提交答卷</button>
+    </div>
+  </div>
+
+  <!-- 结果 -->
+  <div class="result-panel" id="resultPanel">
+    <h2 id="resultTitle"></h2>
+    <div class="score-big" id="scoreDisplay">0</div>
+    <div class="stat">
+      <div class="detail">✅ 正确：<strong id="correctCount">0</strong> 题</div>
+      <div class="detail">❌ 错误：<strong id="wrongCount">0</strong> 题</div>
+    </div>
+    <div class="detail" id="wrongDetail"></div>
+    <button onclick="location.reload()" style="padding:10px 30px;border-radius:8px;border:none;background:#1a73e8;color:#fff;font-weight:600;cursor:pointer;margin-top:15px">🔄 重新考试</button>
+  </div>
+</div>
+
+<script>
+const EXAM_DATA = {"title": "文员专项培训——消防12条/消防跑点", "totalScore": 100, "passScore": 80, "timeLimit": 10, "maxAttempts": 3, "questions": [{"id": 1, "type": "single", "stem": "中控室执行什么时长的值守制度？", "options": ["A. 24小时双人在岗值守", "B. 12小时单人在岗", "C. 8小时轮岗", "D. 白班在岗"], "answer": 0, "score": 10}, {"id": 2, "type": "single", "stem": "火警跑点测试要求在多少分钟内完成跑点？", "options": ["A. 1分钟", "B. 3分钟", "C. 5分钟", "D. 10分钟"], "answer": 1, "score": 10}, {"id": 3, "type": "single", "stem": "火警跑点后要求在多少分钟内完成复位？", "options": ["A. 1分钟", "B. 3分钟", "C. 5分钟", "D. 10分钟"], "answer": 2, "score": 10}, {"id": 4, "type": "single", "stem": "消防12条中，消控岗/工程岗等准入作业证件的要求是什么？", "options": ["A. 证件在有效期内到期前完成审核", "B. 证件可以过期使用", "C. 无需审核证件", "D. 仅需拍照留存"], "answer": 0, "score": 10}, {"id": 5, "type": "multiple", "stem": "消防跑点人员应携带哪些器材？（多选）", "options": ["A. 对讲机", "B. 灭火器", "C. 复位钥匙", "D. 相机"], "answer": [0, 1, 2], "score": 10}, {"id": 6, "type": "multiple", "stem": "微型消防站应配备的防护装备包括哪些？（多选）", "options": ["A. 带灯头盔", "B. 消防服", "C. 消防靴", "D. 防毒面具"], "answer": [0, 1, 2], "score": 10}, {"id": 7, "type": "multiple", "stem": "消防系统检查中应关注哪些设备？（多选）", "options": ["A. 消防主机运行状态", "B. 消防电话连通情况", "C. 应急广播测试", "D. 空调系统温度"], "answer": [0, 1, 2], "score": 10}, {"id": 8, "type": "judge", "stem": "中控室应执行24小时双人在岗值守制度，无特殊情况不得单人值守。", "options": ["正确", "错误"], "answer": 0, "score": 10}, {"id": 9, "type": "judge", "stem": "消防跑点时只需携带对讲机即可，灭火器和复位钥匙不需要带。", "options": ["正确", "错误"], "answer": 1, "score": 10}, {"id": 10, "type": "judge", "stem": "消防主机保持手动允许状态，系统保持全局自动状态。", "options": ["正确", "错误"], "answer": 0, "score": 10}]}
+  title: "文员专项培训——消防12条/消防跑点",
+  totalScore: 100,
+  passScore: 90,
+  timeLimit: 45,
+  maxAttempts: 3,
+  questions: [
+    {id:1,type:"single",score:4,stem:"发现或接报园区内有人实施斗殴行为后，应首先通知谁？",options:["A. 保安主管和物业经理","B. 公司总部领导","C. 公安机关","D. 园区所有员工"],answer:0},
+    {id:2,type:"single",score:4,stem:"斗殴现场如有持械且不听劝阻的人员，保安人员应如何处置？",options:["A. 立即报警等待警方处理","B. 穿戴防暴用具并立即收缴器械","C. 呼叫增援并疏散人群","D. 记录现场并拍照备案"],answer:1},
+    {id:3,type:"single",score:4,stem:"斗殴事件中如伤员重伤或流血严重，应首先采取什么措施？",options:["A. 征求当事人意见是否报案","B. 拨打120急救电话并报警处置","C. 先拍照留存现场证据","D. 将伤员扶到安全区域"],answer:1},
+    {id:4,type:"single",score:4,stem:"斗殴行为对园区设施造成损害时，由谁作勘查报告？",options:["A. 保安主管","B. 物业经理","C. 警方","D. 保险公司"],answer:2},
+    {id:5,type:"single",score:4,stem:"盗窃、抢劫等突发事件发生后，园区应首先做什么？",options:["A. 保护现场并安排专人值守","B. 立刻组织安管员前往现场制止犯罪","C. 拨打110电话报警","D. 拍照留存现场证据"],answer:1},
+    {id:6,type:"single",score:4,stem:"秩序维护员遇到自身无法处理的严重犯罪案情时，应如何处置？",options:["A. 先稳定现场再自行处理","B. 等待其他队员到场后处理","C. 上报公司领导并拨打110报警","D. 拍照记录后通知物业经理"],answer:2},
+    {id:7,type:"single",score:4,stem:"犯罪分子逃跑且追捕不上时，需要记录的信息不包括以下哪项？",options:["A. 人数和衣着","B. 相貌和身体特征","C. 犯罪动机","D. 所用交通工具及特征"],answer:2},
+    {id:8,type:"single",score:4,stem:"盗窃、抢劫案件发生后需要保护现场，以下哪项行为是错误的？",options:["A. 安排专人值守现场","B. 拍照记录现场情况","C. 清理罪犯留下的烟头","D. 不让外人进入现场"],answer:2},
+    {id:9,type:"single",score:4,stem:"斗殴事件处理完毕后，应填写什么报告呈总部领导？",options:["A. 《保安值班记录》","B. 《事故调查报告》","C. 《紧急事件处理规程》","D. 《事件报告》"],answer:3},
+    {id:10,type:"single",score:4,stem:"盗抢犯罪案件处理完毕后，由谁写出书面报告向物业经理报告？",options:["A. 当班秩序维护班长","B. 物业经理本人","C. 园区领导","D. 安管队长"],answer:0},
+    {id:11,type:"multiple",score:4,stem:"接报园区内有人实施斗殴后，向保安主管和物业经理报告时应说明哪些情况？（多选）",options:["A. 地点","B. 人员数量","C. 当事人姓名","D. 有无凶器"],answer:[0,1,3]},
+    {id:12,type:"multiple",score:4,stem:"斗殴现场制止原则包括哪些内容？（多选）",options:["A. 劝阻双方住手住口，避免二次伤害","B. 将争吵或斗殴的双方或一方劝离现场","C. 立即报警交由警方处理","D. 持有器械斗殴应先制止持械一方"],answer:[0,1,3]},
+    {id:13,type:"multiple",score:4,stem:"斗殴现场如有伤情，处理方式正确的有哪些？（多选）",options:["A. 轻伤可征求当事人意见是否报案","B. 重伤或流血严重应拨打120并报警","C. 所有伤情都必须立即报警","D. 等待急救人员到来前需提供必要急救措施"],answer:[0,1,3]},
+    {id:14,type:"multiple",score:4,stem:"斗殴行为对园区设施、财产、人员造成损害时，应做好的工作包括哪些？（多选）",options:["A. 作好记录并拍照备案","B. 由当事人签名确认","C. 直接通知保险公司理赔","D. 必要时协同警务人员扣下肇事人"],answer:[0,1,3]},
+    {id:15,type:"multiple",score:4,stem:"处理斗殴及暴力行为过程中应遵循的态度要求包括哪些？（多选）",options:["A. 保持客观的态度","B. 保持克制的态度","C. 严厉训斥肇事人员","D. 尽量避免与人发生口角及冲突"],answer:[0,1,3]},
+    {id:16,type:"multiple",score:4,stem:"秩序维护员在遇到盗窃、抢劫等犯罪行为时，正确的处置方式有哪些？（多选）",options:["A. 立即上前制止","B. 沉着冷静、机智勇敢，设法制服罪犯","C. 如人力不足应呼叫增援并报告领导","D. 直接拨打110报警等待警方处理"],answer:[0,1,2]},
+    {id:17,type:"multiple",score:4,stem:"盗窃、抢劫案件发生后需要保护现场，不得擅自移动的东西包括哪些？（多选）",options:["A. 罪犯留下的手痕","B. 罪犯留下的脚印","C. 受害人的物品","D. 罪犯留下的烟头"],answer:[0,1,3]},
+    {id:18,type:"multiple",score:4,stem:"涉及现场破坏或物品损坏的犯罪案件，后续处理需要记录的信息包括哪些？（多选）",options:["A. 物品名称","B. 损坏位置","C. 损坏原因","D. 数量"],answer:[0,1,3]},
+    {id:19,type:"multiple",score:4,stem:"犯罪分子逃跑时应记录的信息包括哪些？（多选）",options:["A. 人数和衣着","B. 相貌和身体特征","C. 逃跑原因","D. 逃跑方向和交通工具特征"],answer:[0,1,3]},
+    {id:20,type:"multiple",score:4,stem:"盗抢犯罪案件的事后处理工作包括哪些内容？（多选）",options:["A. 配合公安机关做好事后处理","B. 当班班长在《保安值班记录》中记录情况","C. 召开全体员工总结大会","D. 事情处理完毕后写出书面报告向物业经理报告"],answer:[0,1,3]},
+    {id:21,type:"judge",score:2,stem:"斗殴行为如果场面无法控制，应报警处理。",options:["正确","错误"],answer:0},
+    {id:22,type:"judge",score:2,stem:"斗殴现场制止时，应先制止持械一方。",options:["正确","错误"],answer:0},
+    {id:23,type:"judge",score:2,stem:"斗殴现场有伤员时，应先将伤员送医院救治，再处理其他情况。",options:["正确","错误"],answer:0},
+    {id:24,type:"judge",score:2,stem:"斗殴行为对园区设施造成损害时，应直接由园区自行评估赔偿金额。",options:["正确","错误"],answer:1},
+    {id:25,type:"judge",score:2,stem:"盗窃、抢劫案件如果秩序维护员人力不足，应迅速通过通讯设备呼叫增援。",options:["正确","错误"],answer:0},
+    {id:26,type:"judge",score:2,stem:"接到盗窃、抢劫等突发事件报告，应等待物业经理到场后再组织安管员前往现场。",options:["正确","错误"],answer:1},
+    {id:27,type:"judge",score:2,stem:"犯罪现场保护期间，只有在公安机关人员勘查完毕后才能离开现场。",options:["正确","错误"],answer:0},
+    {id:28,type:"judge",score:2,stem:"犯罪分子逃跑时只需要记录其逃往方向即可。",options:["正确","错误"],answer:1},
+    {id:29,type:"judge",score:2,stem:"盗抢犯罪案件涉及现场破坏或物品损坏时，必要时可申报保险理赔。",options:["正确","错误"],answer:0},
+    {id:30,type:"judge",score:2,stem:"斗殴事件发生后，应记录事件详细经过并填写《事件报告》呈总部领导。",options:["正确","错误"],answer:0}
+  ]
+};
+
+// 验证：计算总分
+let totalScore = 0;
+EXAM_DATA.questions.forEach(q => { totalScore += q.score; });
+console.log('总分校验:', totalScore, '分');
+
+let studentInfo = {};
+let examStarted = false;
+let examSubmitted = false;
+let timerInterval = null;
+let timeRemaining = EXAM_DATA.timeLimit * 60;
+
+function getFingerprint() {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.fillText(navigator.userAgent + screen.width + screen.height, 10, 10);
+  return btoa(ctx.fillText + canvas.toDataURL()).slice(0,32);
+}
+
+function getAttempts() {
+  return parseInt(localStorage.getItem('exam_attempts_' + getFingerprint()) || 0);
+}
+
+function incrementAttempts() {
+  localStorage.setItem('exam_attempts_' + getFingerprint(), getAttempts() + 1);
+}
+
+function startExam() {
+  const name = document.getElementById('studentName').value.trim();
+  const park = document.getElementById('studentPark').value.trim();
+  const role = document.getElementById('studentRole').value.trim();
+  
+  if(!name || !park || !role) {
+    alert('请完整填写考生信息（姓名、所在园区、岗位名称）！');
+    return;
+  }
+  
+  const attempts = getAttempts();
+  if(attempts >= EXAM_DATA.maxAttempts) {
+    alert('⚠ 您已用完 ' + EXAM_DATA.maxAttempts + ' 次考试机会！');
+    return;
+  }
+  
+  studentInfo = { name, park, role };
+  examStarted = true;
+  
+  document.getElementById('showName').textContent = name;
+  document.getElementById('showPark').textContent = park;
+  document.getElementById('showRole').textContent = role;
+  document.getElementById('attemptNum').textContent = attempts + '/' + EXAM_DATA.maxAttempts;
+  document.getElementById('statusBar').style.display = 'flex';
+  document.getElementById('timerBar').style.display = 'block';
+  document.getElementById('questionArea').style.display = 'block';
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('submitBtn').disabled = false;
+  document.querySelectorAll('.form-field input').forEach(e => e.disabled = true);
+  
+  renderQuestions();
+  startTimer();
+}
+
+function renderQuestions() {
+  const list = document.getElementById('questionList');
+  list.innerHTML = '';
+  
+  const typeLabels = {single:'单选题', multiple:'多选题', judge:'判断题'};
+  const typeColors = {single:'q-single', multiple:'q-multiple', judge:'q-judge'};
+  
+  EXAM_DATA.questions.forEach((q, idx) => {
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    
+    let optionsHtml = '';
+    if(q.type === 'judge') {
+      optionsHtml = q.options.map((o, oi) => 
+        `<label><input type="radio" name="q${idx}" value="${oi}"> ${o}</label>`
+      ).join('');
+    } else {
+      const optType = q.type === 'single' ? 'radio' : 'checkbox';
+      optionsHtml = q.options.map((o, oi) => 
+        `<label><input type="${optType}" name="q${idx}" value="${oi}"> ${o}</label>`
+      ).join('');
+    }
+    
+    card.innerHTML = `
+      <div class="q-header">
+        <span class="q-num">第${idx+1}题</span>
+        <span><span class="q-badge ${typeColors[q.type]}">${typeLabels[q.type]}</span></span>
+        <span class="q-score">${q.score} 分</span>
+      </div>
+      <div class="q-stem">${q.stem}</div>
+      <div class="options">${optionsHtml}</div>
+      <div class="fb" id="fb-${idx}"></div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+function startTimer() {
+  timeRemaining = EXAM_DATA.timeLimit * 60;
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timeRemaining--;
+    updateTimerDisplay();
+    if(timeRemaining <= 0) {
+      clearInterval(timerInterval);
+      alert('⏰ 时间到！自动提交');
+      submitExam();
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timeRemaining / 60);
+  const s = timeRemaining % 60;
+  document.getElementById('timerText').textContent = 
+    `⏱ 剩余时间：${m}分${s.toString().padStart(2,'0')}秒`;
+}
+
+async function submitExam() {
+  if(examSubmitted) return;
+  if(!confirm('确认提交答卷？提交后不能修改！')) return;
+  examSubmitted = true;
+  clearInterval(timerInterval);
+  document.getElementById('submitBtn').disabled = true;
+  
+  // 数据上报
+  const reportData = {
+    name: studentInfo.name,
+    park: studentInfo.park,
+    role: studentInfo.role,
+    answers: EXAM_DATA.questions.map((q, idx) => {
+      const sel = document.querySelector(`input[name="q${idx}"]:checked`);
+      return sel ? parseInt(sel.value) : -1;
+    }),
+    correctCount: 0,
+    wrongCount: 0
+  };
+  const reportData = {
+    name: studentInfo.name,
+    park: studentInfo.park,
+    role: studentInfo.role,
+    answers: EXAM_DATA.questions.map((q, idx) => {
+      const sel = document.querySelector(`input[name="q${idx}"]:checked`);
+      return sel ? parseInt(sel.value) : -1;
+    }),
+    correctCount: 0,
+    wrongCount: 0
+  };
+  let score = 0;
+  let correct = 0;
+  let wrong = 0;
+  
+  EXAM_DATA.questions.forEach((q, idx) => {
+    const fb = document.getElementById('fb-' + idx);
+    let isCorrect = false;
+    let userAns = null;
+    
+    if(q.type === 'judge') {
+      const sel = document.querySelector(`input[name="q${idx}"]:checked`);
+      userAns = sel ? parseInt(sel.value) : -1;
+      isCorrect = userAns === q.answer;
+    } else if(q.type === 'single') {
+      const sel = document.querySelector(`input[name="q${idx}"]:checked`);
+      userAns = sel ? parseInt(sel.value) : -1;
+      isCorrect = userAns === q.answer;
+    } else {
+      const checks = document.querySelectorAll(`input[name="q${idx}"]:checked`);
+      userAns = Array.from(checks).map(c => parseInt(c.value));
+      const correctAns = q.answer;
+      isCorrect = userAns.length === correctAns.length && userAns.every(v => correctAns.includes(v));
+    }
+    
+    if(isCorrect) {
+      score += q.score;
+      correct++;
+    } else {
+      wrong++;
+      let ansText = '';
+      if(q.type === 'judge') {
+        ansText = q.answer === 0 ? '正确' : '错误';
+      } else {
+        ansText = q.options[q.answer];
+      }
+      fb.className = 'fb wrong';
+      fb.innerHTML = `❌ 错误（正确答案：<span class="correct-ans">${ansText}</span>）`;
+    }
+  });
+  
+  document.getElementById('resultPanel').style.display = 'block';
+  document.getElementById('scoreDisplay').textContent = score + '分';
+  document.getElementById('scoreDisplay').className = 'score-big ' + (score >= EXAM_DATA.passScore ? 'pass' : 'fail');
+  document.getElementById('correctCount').textContent = correct;
+  document.getElementById('wrongCount').textContent = wrong;
+  document.getElementById('wrongDetail').textContent = 
+    `⚠ 错误率：${Math.round(wrong/30*100)}% (${wrong}/30题)`;
+  
+  const passText = score >= EXAM_DATA.passScore ? '🎉 恭喜通过！' : '😢 未通过（需≥90分）';
+  document.getElementById('resultTitle').textContent = passText;
+  
+  reportData.correctCount = correct;
+  reportData.wrongCount = wrong;
+  // 上报答题数据到后端
+  try {
+    await fetch('http://10.9.236.141:5000/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: reportData.name,
+        park: reportData.park,
+        role: reportData.role,
+        score: score,
+        total: EXAM_DATA.totalScore,
+        pass: score >= EXAM_DATA.passScore,
+        correct: reportData.correctCount,
+        wrong: reportData.wrongCount,
+        title: EXAM_DATA.title
+      })
+    });
+  } catch(e) { console.log('数据上报异常:', e); }
+  incrementAttempts();
+}
+</script>
+</body>
+</html>
