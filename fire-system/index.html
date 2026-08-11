@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>工程岗位-6.1消防系统专项考试</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:sans-serif;background:#f0f2f5;padding:15px;min-height:100vh}
+.container{max-width:800px;margin:0 auto;background:#fff;border-radius:16px;padding:20px}
+h1{text-align:center;font-size:22px;margin-bottom:5px}
+.sub{text-align:center;color:#888;font-size:14px;margin-bottom:15px;border-bottom:1px solid #eee;padding-bottom:10px}
+
+/* 考生信息 */
+.info-box{background:#f8f9fa;border-radius:10px;padding:15px;margin-bottom:15px}
+.info-box h3{font-size:15px;margin-bottom:12px;padding-bottom:6px;border-bottom:2px solid #1a73e8;display:inline-block}
+.info-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.info-field{flex:1;min-width:150px}
+.info-field label{display:block;font-size:13px;color:#666;margin-bottom:4px;font-weight:600}
+.info-field input{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:15px;outline:none}
+.info-field input:focus{border-color:#1a73e8}
+.btn-start{display:block;width:100%;padding:12px;background:#1a73e8;color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;margin-top:8px}
+.btn-start:disabled{background:#aaa}
+
+/* 状态栏
+.status-bar{background:#f8f9fa;border-radius:10px;padding:12px 15px;margin:12px 0;display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;font-size:14px}
+.status-item{display:flex;align-items:center;gap:5px;color:#555}
+.status-item strong{color:#333}}
+
+/* 倒计时 */
+.timer-bar{background:#fff8e1;border-radius:8px;padding:12px 15px;margin:10px 0;text-align:center;border:1px solid #ffe082;display:none}
+.timer-text{font-size:18px;font-weight:700;color:#333}
+.timer-text.warning{color:#e74c3c}
+
+/* 题目 */
+.q-list{display:flex;flex-direction:column;gap:15px;margin-top:15px}
+.q-card{background:#fafbfc;border:1px solid #e8eaed;border-radius:12px;padding:15px}
+.q-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.q-num{font-weight:600;color:#1a73e8;min-width:35px}
+.q-badge{font-size:12px;padding:2px 8px;border-radius:4px;color:#fff;font-weight:600}
+.q-badge.single{background:#1a73e8}
+.q-badge.multiple{background:#e67e22}
+.q-badge.judge{background:#27ae60}
+.q-score{font-size:13px;color:#888}
+.q-stem{font-size:15px;margin-bottom:10px;line-height:1.6;color:#222}
+.options label{display:flex;align-items:flex-start;gap:10px;padding:10px;margin:5px 0;border-radius:8px;border:1px solid #e8eaed;cursor:pointer;font-size:14px}
+.fb{margin-top:8px;padding:8px;border-radius:8px;font-size:14px;display:none}
+.fb.correct{background:#e6f7e6;color:#1a7a1a;border:1px solid #b3e0b3;display:block}
+.fb.wrong{background:#fde8e8;color:#c0392b;border:1px solid #f5c6c5;display:block}
+.fb .ans{color:#1a73e8;font-weight:600}
+
+/* 提交与结果 */
+.btn-submit{padding:12px 40px;font-size:16px;border-radius:10px;border:none;background:#1a73e8;color:#fff;font-weight:600;cursor:pointer;transition:all .2s;display:block;margin:20px auto 0}
+.btn-submit:disabled{background:#aaa}
+.btn-submit:hover{background:#1557b0}
+.result-panel{display:none;margin-top:20px;background:#f8f9fa;border-radius:12px;padding:20px;text-align:center}
+.result-panel .score-big{font-size:42px;font-weight:700;margin:10px 0}
+.score-big.pass{color:#27ae60}
+.score-big.fail{color:#e74c3c}
+.result-panel .detail{font-size:15px;color:#555;margin:8px 0}
+.result-panel .stat{display:flex;gap:15px;justify-content:center;margin:10px 0}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🏆 工程岗位-6.1消防系统专项考试</h1>
+  <div class="sub">满分100分 | 95分及格 | 45分钟限时 | 每设备限考3次</div>
+
+  <!-- 考生信息 -->
+  <div class="info-box">
+    <h3>📝 填写信息</h3>
+    <div class="info-row">
+      <div class="info-field">
+        <label>姓名 <span style="color:#e74c3c">*</span></label>
+        <input type="text" id="name" placeholder="姓名" required>
+      </div>
+      <div class="info-field">
+        <label>所在园区 <span style="color:#e74c3c">*</span></label>
+        <input type="text" id="park" placeholder="如：上海宝山" required>
+      </div>
+      <div class="info-field">
+        <label>岗位名称 <span style="color:#e74c3c">*</span></label>
+        <input type="text" id="role" placeholder="如：消控员" required>
+      </div>
+    </div>
+    <button class="btn-start" id="startBtn" onclick="start()">📝 开始考试</button>
+  </div>
+
+  <!-- 状态栏 -->
+  <div class="status-bar" id="statusBar" style="display:none">
+    <div class="status-item">👤 姓名：<strong id="showName">—</strong></div>
+    <div class="status-item">🏢 园区：<strong id="showPark">—</strong></div>
+    <div class="status-item">💼 岗位：<strong id="showRole">—</strong></div>
+    <div class="status-item">📊 已考 <strong id="attemptNum">0/3</strong> 次</div>
+  </div>
+
+  <!-- 倒计时 -->
+  <div class="timer-bar" id="timerBar">
+    <span class="timer-text" id="timerText">⏱ 剩余时间：0分00秒</span>
+  </div>
+
+  <!-- 题目区 -->
+  <div id="questionArea" style="display:none">
+    <div class="q-list" id="questionList"></div>
+    <button class="btn-submit" id="submitBtn" onclick="submit()">📤 提交答卷</button>
+  </div>
+
+  <!-- 结果 -->
+  <div class="result-panel" id="resultPanel">
+    <h2 id="resultTitle"></h2>
+    <div class="score-big" id="scoreDisplay">0</div>
+    <div class="stat">
+      <div class="detail">✅ 正确：<strong id="correctCount">0</strong> 题</div>
+      <div class="detail">❌ 错误：<strong id="wrongCount">0</strong> 题</div>
+    </div>
+    <div class="detail" id="wrongDetail"></div>
+    <button onclick="location.reload()" style="padding:10px 30px;border-radius:8px;border:none;background:#1a73e8;color:#fff;font-weight:600;cursor:pointer;margin-top:15px">🔄 重新考试</button>
+  </div>
+</div>
+
+<div style="text-align:center;color:#999;font-size:12px;margin-top:15px">共 50 题 | 满分 100 分 | 及格 95 分</div>
+
+<script>
+(function() {
+  const EXAM_DATA = {
+    title: "工程岗位-6.1消防系统专项考试",
+    totalScore: 100,
+    passScore: 95,
+    timeLimit: 45,
+    maxAttempts: 3,
+    questions: [{"id": 1, "type": "single", "stem": "消防主机（中控室）的运行状态应设置为？", "options": ["A. 手动允许、全局自动状态", "B. 完全手动状态", "C. 完全自动状态", "D. 手动禁止、局部自动状态"], "answer": 0, "score": 2}, {"id": 2, "type": "single", "stem": "消防应急广播联动测试应每季度进行几次？", "options": ["A. 每季度2次", "B. 每季度1次", "C. 每月1次", "D. 每半年1次"], "answer": 1, "score": 2}, {"id": 3, "type": "single", "stem": "手动控制盘（中控室）应处于什么状态？", "options": ["A. 自动运行状态", "B. 手动或锁定状态", "C. 远程控制状态", "D. 半自动状态"], "answer": 1, "score": 2}, {"id": 4, "type": "single", "stem": "电气火灾报警系统中，剩余电流报警值应低于多少？", "options": ["A. 300mA", "B. 500mA", "C. 800mA", "D. 1000mA"], "answer": 1, "score": 2}, {"id": 5, "type": "single", "stem": "电气火灾报警系统中，温度报警值应低于多少？", "options": ["A. 40℃", "B. 50℃", "C. 60℃", "D. 70℃"], "answer": 2, "score": 2}, {"id": 6, "type": "single", "stem": "浪涌保护器有可视窗时，绿色状态表示什么？", "options": ["A. 正常", "B. 失效", "C. 需更换", "D. 待检测"], "answer": 0, "score": 2}, {"id": 7, "type": "single", "stem": "浪涌保护器无可视窗时，应如何检测？", "options": ["A. 目测外观", "B. 万用表测电阻不为0", "C. 万用表测电压", "D. 观察指示灯"], "answer": 1, "score": 2}, {"id": 8, "type": "single", "stem": "消防水池（红线项）水位要求不低于正常水位的多少？", "options": ["A. 50%", "B. 60%", "C. 70%", "D. 80%"], "answer": 3, "score": 2}, {"id": 9, "type": "single", "stem": "消防水池水位异常项的扣分标准是？", "options": ["A. 10分/项", "B. 50分/项", "C. 100分/项", "D. 200分/项"], "answer": 2, "score": 2}, {"id": 10, "type": "single", "stem": "消火栓/喷淋泵/稳压泵的消防控制柜应保持什么模式？", "options": ["A. 手动模式", "B. 自动模式", "C. 半自动模式", "D. 远程控制模式"], "answer": 1, "score": 2}, {"id": 11, "type": "single", "stem": "火警测试中跑点应在几分钟内完成？", "options": ["A. 1分钟跑点、2分钟复位", "B. 3分钟跑点、5分钟复位", "C. 5分钟跑点、10分钟复位", "D. 2分钟跑点、3分钟复位"], "answer": 1, "score": 2}, {"id": 12, "type": "single", "stem": "稳压泵（高位水箱间/红线项）每小时启停次数要求为？", "options": ["A. ≤5次", "B. ≤10次", "C. ≤15次", "D. ≤20次"], "answer": 2, "score": 2}, {"id": 13, "type": "single", "stem": "高位水箱间消防水箱水位要求不低于正常水位的多少？", "options": ["A. 50%", "B. 60%", "C. 70%", "D. 80%"], "answer": 3, "score": 2}, {"id": 14, "type": "single", "stem": "消防水泵房消火栓/喷淋管网压力参考值范围为？", "options": ["A. 0.20-0.40Mpa", "B. 0.35-0.65Mpa", "C. 0.50-0.80Mpa", "D. 0.60-0.90Mpa"], "answer": 1, "score": 2}, {"id": 15, "type": "single", "stem": "高位水箱间管网压力参考值范围为？", "options": ["A. 0.35-0.65Mpa", "B. 0.20-0.50Mpa", "C. 0.10-0.30Mpa", "D. 0.50-0.80Mpa"], "answer": 1, "score": 2}, {"id": 16, "type": "single", "stem": "消防应急灯断电后可照明时间至少为？", "options": ["A. ≥15分钟", "B. ≥20分钟", "C. ≥30分钟", "D. ≥60分钟"], "answer": 2, "score": 2}, {"id": 17, "type": "single", "stem": "监控主机视频存储天数要求为？", "options": ["A. ＞7天", "B. ＞15天", "C. ＞30天", "D. ＞60天"], "answer": 2, "score": 2}, {"id": 18, "type": "single", "stem": "中控室环境温度和湿度要求为？", "options": ["A. 温度≤30℃、湿度≤60%", "B. 温度≤40℃、湿度≤80%", "C. 温度≤35℃、湿度≤70%", "D. 温度≤45℃、湿度≤85%"], "answer": 1, "score": 2}, {"id": 19, "type": "single", "stem": "五方对讲应能连通哪些点位？", "options": ["A. 轿厢内、轿顶、机房、底坑", "B. 轿厢内、轿顶、机房", "C. 轿厢内、底坑", "D. 轿顶、机房、底坑"], "answer": 0, "score": 2}, {"id": 20, "type": "single", "stem": "消防水泵房泄压阀参考值是多少？", "options": ["A. 0.5Mpa", "B. 0.7Mpa", "C. 0.9Mpa", "D. 1.1Mpa"], "answer": 2, "score": 2}, {"id": 21, "type": "single", "stem": "手动控制盘应每月开展什么测试？", "options": ["A. 自动启动测试", "B. 手动启动测试", "C. 远程控制测试", "D. 联动测试"], "answer": 1, "score": 2}, {"id": 22, "type": "single", "stem": "消防水泵房压力表量程要求为实测压力的多少倍？", "options": ["A. 1-2倍", "B. 2-3倍", "C. 3-4倍", "D. 4-5倍"], "answer": 1, "score": 2}, {"id": 23, "type": "single", "stem": "挡鼠板标准高度为多少？", "options": ["A. 40/50cm", "B. 50/60cm", "C. 60/70cm", "D. 30/40cm"], "answer": 1, "score": 2}, {"id": 24, "type": "single", "stem": "灭火器每多少平米配置2具？", "options": ["A. 每30平米", "B. 每40平米", "C. 每50平米", "D. 每60平米"], "answer": 2, "score": 2}, {"id": 25, "type": "single", "stem": "手提式灭火器安装高度要求为？", "options": ["A. 顶部离地≤1.20m、底部≥0.08m", "B. 顶部离地≤1.50m、底部≥0.08m", "C. 顶部离地≤1.20m、底部≥0.10m", "D. 顶部离地≤1.50m、底部≥0.10m"], "answer": 1, "score": 2}, {"id": 26, "type": "single", "stem": "微型消防站防护装备各需配备多少套？", "options": ["A. 4套", "B. 5套", "C. 6套", "D. 8套"], "answer": 2, "score": 2}, {"id": 27, "type": "single", "stem": "主备泵自动巡检间隔要求为？", "options": ["A. 每天巡检", "B. 每3天巡检", "C. 巡检间隔7天", "D. 巡检间隔15天"], "answer": 2, "score": 2}, {"id": 28, "type": "single", "stem": "消防主机（严重项）的扣分标准是？", "options": ["A. 1分/异常项", "B. 4分/异常项", "C. 10分/异常项", "D. 100分/异常项"], "answer": 2, "score": 2}, {"id": 29, "type": "single", "stem": "消防水泵房消防控制柜属红线项，每项异常扣多少分？", "options": ["A. 10分", "B. 50分", "C. 100分", "D. 200分"], "answer": 2, "score": 2}, {"id": 30, "type": "single", "stem": "水箱渗漏（高位水箱间）属于什么级别？", "options": ["A. 严重项，10分/项", "B. 一般项，4分/项", "C. 轻微项，1分/项", "D. 红线项，100分/项"], "answer": 0, "score": 2}, {"id": 31, "type": "multiple", "stem": "以下哪些属于消防系统红线项检查项目？（多选题）", "options": ["A. 消防控制柜保持自动模式", "B. 水池水位不低于80%", "C. 灭火器外观压力正常", "D. 稳压泵控制柜自动模式"], "answer": [0, 1, 3], "score": 2}, {"id": 32, "type": "multiple", "stem": "火警测试中，跑点人员应携带哪些物品？（多选题）", "options": ["A. 对讲机", "B. 灭火器", "C. 复位钥匙", "D. 防护服"], "answer": [0, 1, 2], "score": 2}, {"id": 33, "type": "multiple", "stem": "以下哪些属于中控室消防系统严重项（10分/项）？（多选题）", "options": ["A. 消防主机外观完好、运行状态正确", "B. 手动控制盘处于手动或锁定状态", "C. 五方对讲可正常连通", "D. 应急广播状态指示灯正常"], "answer": [0, 1, 2], "score": 2}, {"id": 34, "type": "multiple", "stem": "中控室资料记录检查中哪些属于严重项？（多选题）", "options": ["A. 火警故障记录齐全", "B. 非专业人员出入记录完整", "C. 钥匙清单借用记录完整", "D. 消防设施点位图彩打塑封"], "answer": [0, 1, 2], "score": 2}, {"id": 35, "type": "multiple", "stem": "消防水泵房水池防护要求包含哪些？（多选题）", "options": ["A. 给水阀常开", "B. 池盖密封严实带挡水边沿", "C. 上锁钥匙专人专管", "D. 池盖无需密封"], "answer": [0, 1, 2], "score": 2}, {"id": 36, "type": "multiple", "stem": "以下哪些属于消防系统严重项（10分/项）？（多选题）", "options": ["A. 主备泵自动切换正常", "B. 消防水池无渗漏", "C. 稳压泵主备切换正常", "D. 灭火器合格证有效"], "answer": [0, 1, 2], "score": 2}, {"id": 37, "type": "multiple", "stem": "中控室应急处置要求包含哪些？（多选题）", "options": ["A. 火警测试3分钟内跑点", "B. 5分钟复位", "C. 携带对讲机、灭火器、复位钥匙", "D. 跑点无需记录"], "answer": [0, 1, 2], "score": 2}, {"id": 38, "type": "multiple", "stem": "消防主机检查要点包含哪些？（多选题）", "options": ["A. 主机外观完好、显示时间准确", "B. 无故障反馈异常", "C. 无设备屏蔽", "D. 仅需记录故障"], "answer": [0, 1, 2], "score": 2}, {"id": 39, "type": "multiple", "stem": "消防水泵房设备外观检查要求包含哪些？（多选题）", "options": ["A. 消防泵安装牢固", "B. 管道刷红色、有水流方向标识", "C. 保温层完好", "D. 管道无需刷漆"], "answer": [0, 1, 2], "score": 2}, {"id": 40, "type": "multiple", "stem": "以下哪些属于阀门检查要求？（多选题）", "options": ["A. 启闭灵活", "B. 常开常闭指示牌与阀门状态一致", "C. 常开阀全开且铅封完好", "D. 阀门无需标识"], "answer": [0, 1, 2], "score": 2}, {"id": 41, "type": "multiple", "stem": "电气火灾报警系统检查内容包含哪些？（多选题）", "options": ["A. 主机外观完好", "B. 系统自动运行无故障提示", "C. 无私自屏蔽点位", "D. 每月联动测试"], "answer": [0, 1, 2], "score": 2}, {"id": 42, "type": "multiple", "stem": "消防水池（水泵房）检查要求包含哪些？（多选题）", "options": ["A. 水位不低于80%", "B. 无渗漏", "C. 给水阀常开", "D. 池盖不上锁"], "answer": [0, 1, 2], "score": 2}, {"id": 43, "type": "multiple", "stem": "以下哪些属于中控室一般项（4分/项）检查项目？（多选题）", "options": ["A. 消防电话总机可正常拨号连通分机", "B. 电子围栏/红外对射报警功能正常", "C. 监控主机时间误差≤5分钟", "D. 微型消防站器材齐全"], "answer": [0, 1, 2], "score": 2}, {"id": 44, "type": "multiple", "stem": "高位水箱间管网和阀门检查要求包含哪些？（多选题）", "options": ["A. 电接点压力表按设计设定", "B. 管网参考0.2-0.5Mpa", "C. 阀门启闭灵活", "D. 常开阀无需铅封"], "answer": [0, 1, 2], "score": 2}, {"id": 45, "type": "multiple", "stem": "稳压泵（高位水箱间/红线项）检查要求包含哪些？（多选题）", "options": ["A. 控制柜自动模式", "B. 手自动启停正常", "C. 每小时启停≤15次", "D. 手动模式运行"], "answer": [0, 1, 2], "score": 2}, {"id": 46, "type": "multiple", "stem": "中控室轻微项（1分/项）检查内容包含哪些？（多选题）", "options": ["A. 电子围栏/红外对射外观无破损锈蚀", "B. 挡鼠板高度50/60cm", "C. 环境整洁、门窗完好", "D. 消防电话分机地址编码准确"], "answer": [0, 1, 2], "score": 2}, {"id": 47, "type": "multiple", "stem": "消火栓/喷淋泵/稳压泵泵组切换检查要求包含哪些？（多选题）", "options": ["A. 主备泵自动切换正常", "B. 巡检柜自动巡检间隔7天", "C. 手动切换测试每月一次", "D. 巡检柜无需自动运行"], "answer": [0, 1], "score": 2}, {"id": 48, "type": "multiple", "stem": "中控室UPS/EPS电源检查要求包含哪些？（多选题）", "options": ["A. 市电供电正常", "B. 备用电源无变形鼓包漏液", "C. 主电断开后备用电源自动投入使用", "D. 备用电源定期更换"], "answer": [0, 1, 2], "score": 2}, {"id": 49, "type": "multiple", "stem": "消防水箱防护检查要求包含哪些？（多选题）", "options": ["A. 给水阀常开", "B. 箱盖密封严实上锁", "C. 钥匙专人专管", "D. 箱体无需密封"], "answer": [0, 1, 2], "score": 2}, {"id": 50, "type": "multiple", "stem": "中控室应急处置预案应包含哪些场景？（多选题）", "options": ["A. 火警", "B. 电梯困人", "C. 水管爆裂", "D. 台风应急"], "answer": [0, 1, 2], "score": 2}]
+  };
+
+  var fp = '';
+  try { var c = document.createElement('canvas'); var ctx = c.getContext('2d'); ctx.fillText(navigator.userAgent + screen.width, 10, 10); fp = btoa(ctx.fillText + c.toDataURL()).slice(0,32); } catch(e) { fp = 'default'; }
+  var storageKey = 'exam_' + fp;
+
+  function getAttempts() { return parseInt(localStorage.getItem(storageKey + '_attempts') || '0'); }
+  function incAttempts() { localStorage.setItem(storageKey + '_attempts', getAttempts() + 1); }
+
+  function start() {
+    var name = document.getElementById('name').value.trim();
+    var park = document.getElementById('park').value.trim();
+    var role = document.getElementById('role').value.trim();
+    if(!name || !park || !role) { alert('请完整填写所有信息！'); return; }
+    if (getAttempts() >= EXAM_DATA.maxAttempts) { alert('您已用完所有考试次数！'); return; }
+
+    document.getElementById('startBtn').disabled = true;
+    document.getElementById('showName').textContent = name;
+    document.getElementById('showPark').textContent = park;
+    document.getElementById('showRole').textContent = role;
+    document.getElementById('attemptNum').textContent = getAttempts() + '/' + EXAM_DATA.maxAttempts;
+    document.getElementById('statusBar').style.display = 'flex';
+    document.getElementById('timerBar').style.display = 'block';
+    document.getElementById('questionArea').style.display = 'block';
+
+    renderQuestions();
+    startTimer();
+  }
+
+  function renderQuestions() {
+    var list = document.getElementById('questionList');
+    list.innerHTML = '';
+    EXAM_DATA.questions.forEach(function(q, i) {
+      var typeL = {single:'单选',multiple:'多选',judge:'判断'};
+      var typeB = {single:'single',multiple:'multiple',judge:'judge'};
+      var r = '<div class="q-card"><div class="q-header"><span class="q-num">第'+(i+1)+'题</span><span class="q-badge ' + typeB[q.type] + '">' + typeL[q.type] + '</span><span class="q-score">' + q.score + '分</span></div><div class="q-stem">' + q.stem + '</div><div class="options">';
+      r += q.options.map(function(o, oi) {
+        var t = (q.type == 'judge' || q.type == 'single') ? 'radio' : 'checkbox';
+        return '<label><input type="' + t + '" name="q' + i + '" value="' + oi + '">' + o + '</label>';
+      }).join('');
+      r += '</div><div class="fb" id="fb-' + i + '"></div></div>';
+      list.innerHTML += r;
+    });
+  }
+
+  function startTimer() {
+    var remaining = EXAM_DATA.timeLimit * 60;
+    var timer = setInterval(function() {
+      remaining--;
+      var m = Math.floor(remaining / 60), s = remaining % 60;
+      document.getElementById('timerText').textContent = '⏱ 剩余时间：' + m + '分' + s.toString().padStart(2,'0') + '秒';
+      if (remaining <= 0) { clearInterval(timer); alert('时间到！'); submit(); }
+    }, 1000);
+    window._examTimer = timer;
+  }
+
+  function submit() {
+    if (window._examSubmitted) return;
+    if (!confirm('确认提交？')) return;
+    window._examSubmitted = true;
+    clearInterval(window._examTimer || 0);
+    document.getElementById('submitBtn').disabled = true;
+
+    var score = 0, correct = 0, wrong = 0;
+    EXAM_DATA.questions.forEach(function(q, i) {
+      var ans = [];
+      if (q.type == 'judge' || q.type == 'single') {
+        var sel = document.querySelector('input[name="q' + i + '"]:checked');
+        ans = sel ? [parseInt(sel.value)] : [];
+      } else {
+        var checks = document.querySelectorAll('input[name="q' + i + '"]:checked');
+        ans = Array.from(checks).map(function(c) { return parseInt(c.value); });
+      }
+      var isc = false;
+      if (q.type == 'single' || q.type == 'judge') isc = ans.length == 1 && ans[0] == q.answer;
+      else {
+        var ca = [].concat(q.answer);
+        isc = ans.length == ca.length && ans.every(function(v) { return ca.indexOf(v) >= 0; });
+      }
+      if (isc) { score += q.score; correct++; } else { wrong++; }
+      var fb = document.getElementById('fb-' + i);
+      if (isc) { fb.className = 'fb correct'; fb.textContent = '✓ 正确'; }
+      else { fb.className = 'fb wrong'; fb.textContent = '✗ 错误'; }
+    });
+
+    document.getElementById('resultPanel').style.display = 'block';
+    var sd = document.getElementById('scoreDisplay');
+    sd.textContent = score + '分';
+    sd.className = 'score-big ' + (score >= EXAM_DATA.passScore ? 'pass' : 'fail');
+    document.getElementById('correctCount').textContent = correct;
+    document.getElementById('wrongCount').textContent = wrong;
+    var pass = score >= EXAM_DATA.passScore ? '过关' : '未通过';
+    document.getElementById('wrongDetail').textContent = '⚠ 错误率：' + Math.round(wrong / EXAM_DATA.questions.length * 100) + '%';
+
+    // 上报到 webhook
+    try {
+      var name = document.getElementById('name').value;
+      var park = document.getElementById('park').value;
+      var role = document.getElementById('role').value;
+      var now = new Date().toLocaleString();
+      var p = 'name=' + encodeURIComponent(name) + '&park=' + encodeURIComponent(park) + '&role=' + encodeURIComponent(role) + '&score=' + score + '&total=' + EXAM_DATA.totalScore + '&result=' + encodeURIComponent(pass) + '&correct=' + correct + '&wrong=' + wrong + '&time=' + encodeURIComponent(now);
+      navigator.sendBeacon('https://webhook.site/45bd24a1-125c-4928-9fba-51d81c3a585a', p);
+    } catch(e) {}
+    incAttempts();
+  }
+
+  
+})();
+</script>
+</body>
+</html>
